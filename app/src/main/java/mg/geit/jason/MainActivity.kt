@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -44,7 +45,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mg.geit.jason.ui.theme.GPROD80Theme
-import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +52,6 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
-
                 MainScreen(
                 )
             }
@@ -105,7 +104,7 @@ fun MainScreen() {
                         .align(Alignment.CenterHorizontally),
                     color = colorResource(id = R.color.color1),
                     contentColor = colorResource(id = R.color.white),
-                    content = { Greeting(
+                    content = { TitleSection(
                         modifier = Modifier.padding(5.dp),
                         textAlign = TextAlign.Center,
                     ) },
@@ -126,7 +125,7 @@ fun MainScreen() {
 }
 
 @Composable
-fun Greeting(modifier: Modifier = Modifier, textAlign: TextAlign){
+fun TitleSection(modifier: Modifier = Modifier, textAlign: TextAlign){
     Text(
         text = "Catégories",
         modifier = modifier,
@@ -136,37 +135,38 @@ fun Greeting(modifier: Modifier = Modifier, textAlign: TextAlign){
 @Composable
 fun ScrollContent(innerPadding: PaddingValues) {
     val categories = listOf(
-        Category("Nourriture", R.drawable.vector),
-        Category("Fourniture", R.drawable.fourniture),
-        Category("Électronique", R.drawable.electronique),
-        Category("Ménager", R.drawable.menager),
-        Category("Soin", R.drawable.ic_launcher_foreground),
-        Category("Nourriture", R.drawable.vector),
-        Category("Fourniture", R.drawable.fourniture),
-        Category("Électronique", R.drawable.electronique),
-        Category("Ménager", R.drawable.menager),
-        Category("Soin", R.drawable.ic_launcher_foreground),
-        Category("Nourriture", R.drawable.vector),
-        Category("Fourniture", R.drawable.fourniture),
-        Category("Électronique", R.drawable.electronique),
-        Category("Ménager", R.drawable.menager),
-        Category("Soin", R.drawable.ic_launcher_foreground),
+        Category("NOURRITURE", R.drawable.vector),
+        Category("FOURNITURE", R.drawable.fourniture),
+        Category("ELECTRONIQUE", R.drawable.electronique),
+        Category("MENAGER", R.drawable.menager),
+        Category("SOIN", R.drawable.ic_launcher_foreground),
+        Category("NOURRITURE", R.drawable.vector),
+        Category("FOURNITURE", R.drawable.fourniture),
+        Category("ELECTRONIQUE", R.drawable.electronique),
+        Category("MENAGER", R.drawable.menager),
+        Category("SOIN", R.drawable.ic_launcher_foreground),
+        Category("NOURRITURE", R.drawable.vector),
+        Category("FOURNITURE", R.drawable.fourniture),
+        Category("ELECTRONIQUE", R.drawable.electronique),
+        Category("MENAGER", R.drawable.menager),
+        Category("SOIN", R.drawable.ic_launcher_foreground),
 
     )
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = innerPadding,
+        modifier = Modifier.background(color = Color.White)
     ) {
         items(categories){ category ->
             run {
-                CategoryCard(category, Random.nextInt(1,5))
+                CategoryCard(category)
             }
         }
     }
 }
 
 @Composable
-fun CategoryCard(category: Category, id : Int) {
+fun CategoryCard(category: Category) {
     val idColor = listOf(R.color.color1, R.color.color2, R.color.color3, R.color.color4)
     Card(
         modifier = Modifier
@@ -183,7 +183,7 @@ fun CategoryCard(category: Category, id : Int) {
                 .fillMaxSize()
 
         ) {
-            Icon(painterResource(id = category.iconRes), contentDescription = null, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Icon(painterResource(id = category.iconRes), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
             Text(text = category.name)
         }
     }
