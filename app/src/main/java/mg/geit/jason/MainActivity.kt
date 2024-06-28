@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
+
                 MainScreen(
                 )
             }
