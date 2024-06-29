@@ -2,11 +2,14 @@
 
 package mg.geit.jason
 
+import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -49,16 +53,19 @@ class MainActivity : ComponentActivity() {
     private var dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dataManager.insertCatProduit("NOURRITURE")
-        dataManager.insertCatProduit("FOURNITURE")
-        dataManager.insertCatProduit("ELECTRONIQUE")
-        dataManager.insertCatProduit("MENAGER")
-        dataManager.insertCatProduit("SOIN")
-
+        dataManager.insertCatProduit("NOURRITURE", R.drawable.vector)
+        dataManager.insertCatProduit("FOURNITURE", R.drawable.fourniture)
+        dataManager.insertCatProduit("ELECTRONIQUE", R.drawable.electronique)
+        dataManager.insertCatProduit("MENAGER", R.drawable.menager)
+        dataManager.insertCatProduit("SOIN", R.drawable.ic_launcher_foreground)
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
-                MainScreen1(dataManager)
+                MainScreen1(dataManager, seeListActivity = {
+                    val intent = Intent(this, ListProduitActivity::class.java)
+                    Log.i("clickCard","CardClické")
+                    startActivity(intent)
+                })
             }
         }
     }
@@ -66,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen1(dataManager: DataManager) {
+fun MainScreen1(dataManager: DataManager, seeListActivity: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -83,7 +90,7 @@ fun MainScreen1(dataManager: DataManager) {
             }
         },
     ) { innerPadding ->
-        ScrollContent(dataManager, innerPadding)
+        ScrollContent(dataManager, innerPadding, seeListActivity)
     }
 }
 
@@ -143,8 +150,9 @@ fun TitleSection(title: String, modifier: Modifier = Modifier, textAlign: TextAl
         textAlign = textAlign
     )
 }
+
 @Composable
-fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues) {
+fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeListActivity: () -> Unit) {
     val categories = dataManager.readCategories()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -153,20 +161,21 @@ fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues) {
     ) {
         items(categories){ category ->
             run {
-                CategoryCard(category)
+                CategoryCard(category, seeListActivity)
             }
         }
     }
 }
 
 @Composable
-fun CategoryCard(category: Category) {
+fun CategoryCard(category: Category, seeListActivity: () -> Unit) {
     val idColor = listOf(R.color.color1, R.color.color2, R.color.color3, R.color.color4)
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxHeight()
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { seeListActivity()},
         colors = CardDefaults.cardColors(colorResource(idColor.random())),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
@@ -178,19 +187,14 @@ fun CategoryCard(category: Category) {
                 .fillMaxSize()
 
         ) {
-//            Icon(painterResource(id = category.iconRes), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Icon(painterResource(id = category.image), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
             Text(text = category.name)
         }
     }
 }
-
 @Preview(showBackground = true)
 @Composable
-fun Preview1() {
-    // Crée une instance fictive de DataManager avec des données de test
-    val fakeDataManager = DataManager(null)
+fun Preview(){
     GPROD80Theme {
-        MainScreen1(fakeDataManager)
     }
 }
-
