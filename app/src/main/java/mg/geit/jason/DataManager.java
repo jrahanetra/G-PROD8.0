@@ -26,7 +26,8 @@ public class DataManager extends SQLiteOpenHelper {
         String newStrSql = "Create Table Produits  (" +
                 "id_Produit integer primary key autoincrement," +
                 "name_Produit text not null," +
-
+                "prix_Produit integer not null,"+
+                "quantite_Produit integer not null,"+
                 "description_Produit text not null,"+
                 "id_Categorie integer,"+
                 "foreign key(id_Categorie) references ProduitCategorie(id_Categorie)" +
@@ -39,16 +40,16 @@ public class DataManager extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
-    public void insertProduit(String name, String description, Integer id_Produit)
+    public void insertProduit(String name, int prix, int qtt, String description, int id_CatProduit)
     {
-        String strSql = "Insert into Produits (name_Produit, description_Produit,id_Categorie) values" +
-                "('"+name+"','"+description+"','"+id_Produit+"')";
+        String strSql = "Insert into Produits (name_Produit, prix_Produit, quantite_Produit, description_Produit,id_Categorie) values" +
+                "('"+name+"',"+prix+","+qtt+",'"+description+"',"+id_CatProduit+")";
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(strSql);
         Log.i("DataBase", "insertProduit invoked ");
     }
 
-    public  void insertCatProduit(String name_Cat, Integer image_Cat){
+    public  void insertCatProduit(String name_Cat, int image_Cat){
         String strSql = "Insert into ProduitCategorie (name_Categorie, icon_Categorie) values"+
                 "('"+name_Cat+"',"+image_Cat+")";
         SQLiteDatabase  db = this.getWritableDatabase();
@@ -65,11 +66,27 @@ public class DataManager extends SQLiteOpenHelper {
 
         while(! cursor.isAfterLast())
         {
-            Category categoryData = new Category(cursor.getString(1), cursor.getInt(2));
+            Category categoryData = new Category(cursor.getInt(0),cursor.getString(1), cursor.getInt(2));
             listCat.add(categoryData);
             cursor.moveToNext();
         }
         cursor.close();
         return listCat;
+    }
+
+    public List<Produit> readProduits(Integer id){
+        List<Produit> listProduit = new ArrayList<>();
+
+        String strSql = "Select * from Produits where id_Categorie = "+id+";";
+        Cursor cursor = this.getWritableDatabase().rawQuery(strSql, null);
+        cursor.moveToFirst();
+
+        while(! cursor.isAfterLast()){
+            Produit produit = new Produit(cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(4));
+            listProduit.add(produit);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return listProduit;
     }
 }
