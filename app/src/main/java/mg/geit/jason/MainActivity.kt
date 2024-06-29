@@ -53,7 +53,7 @@ class MainActivity : ComponentActivity() {
     private var dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        insertionData(dataManager)
+        insertionData(dataManager)
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
