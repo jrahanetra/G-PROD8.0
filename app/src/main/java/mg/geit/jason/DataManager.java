@@ -5,8 +5,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-
-import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +20,8 @@ public class DataManager extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String strSql = "Create TABLE ProduitCategorie (" +
                 "id_Categorie integer primary key autoincrement, " +
-                "name_Categorie text not null " +
+                "name_Categorie text not null," +
+                "icon_Categorie integer not null"+
                 ")";
         String newStrSql = "Create Table Produits  (" +
                 "id_Produit integer primary key autoincrement," +
@@ -49,9 +48,9 @@ public class DataManager extends SQLiteOpenHelper {
         Log.i("DataBase", "insertProduit invoked ");
     }
 
-    public  void insertCatProduit(String name_Cat){
-        String strSql = "Insert into ProduitCategorie (name_Categorie) values"+
-                "('"+name_Cat+"')";
+    public  void insertCatProduit(String name_Cat, Integer image_Cat){
+        String strSql = "Insert into ProduitCategorie (name_Categorie, icon_Categorie) values"+
+                "('"+name_Cat+"',"+image_Cat+")";
         SQLiteDatabase  db = this.getWritableDatabase();
         db.execSQL(strSql);
         Log.i("DataBase", "insertCatégories invoked ");
@@ -66,7 +65,7 @@ public class DataManager extends SQLiteOpenHelper {
 
         while(! cursor.isAfterLast())
         {
-            Category categoryData = new Category(cursor.getString(1));
+            Category categoryData = new Category(cursor.getString(1), cursor.getInt(2));
             listCat.add(categoryData);
             cursor.moveToNext();
         }
