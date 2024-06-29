@@ -39,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -47,13 +46,19 @@ import androidx.compose.ui.unit.dp
 import mg.geit.jason.ui.theme.GPROD80Theme
 
 class MainActivity : ComponentActivity() {
+    private var dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        dataManager.insertCatProduit("NOURRITURE")
+        dataManager.insertCatProduit("FOURNITURE")
+        dataManager.insertCatProduit("ELECTRONIQUE")
+        dataManager.insertCatProduit("MENAGER")
+        dataManager.insertCatProduit("SOIN")
+
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
-                MainScreen(
-                )
+                MainScreen1(dataManager)
             }
         }
     }
@@ -61,55 +66,13 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
+fun MainScreen1(dataManager: DataManager) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 
         topBar = {
-            Column {
-                CenterAlignedTopAppBar(
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = colorResource(id = R.color.blue),
-                        titleContentColor = Color.White,
-                    ),
-                    title = {
-                        Text(
-                            "G-PROD8.0",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { /* do something */ }) {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    },
-                    actions = {
-                        IconButton(onClick = { /* do something */ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Menu,
-                                contentDescription = "Localized description"
-                            )
-                        }
-                    },
-                    scrollBehavior = scrollBehavior,
-                )
-                Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally),
-                    color = colorResource(id = R.color.color1),
-                    contentColor = colorResource(id = R.color.white),
-                    content = { TitleSection(
-                        modifier = Modifier.padding(5.dp),
-                        textAlign = TextAlign.Center,
-                    ) },
-               )
-            }
+            Header(title = "Catégories")
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -120,38 +83,69 @@ fun MainScreen() {
             }
         },
     ) { innerPadding ->
-        ScrollContent(innerPadding)
+        ScrollContent(dataManager, innerPadding)
     }
 }
 
 @Composable
-fun TitleSection(modifier: Modifier = Modifier, textAlign: TextAlign){
+fun Header(title: String){
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    Column {
+        CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = colorResource(id = R.color.blue),
+                titleContentColor = Color.White,
+            ),
+            title = {
+                Text(
+                    "G-PROD8.0",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Localized description"
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.Filled.Menu,
+                        contentDescription = "Localized description"
+                    )
+                }
+            },
+            scrollBehavior = scrollBehavior,
+        )
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
+            color = colorResource(id = R.color.color1),
+            contentColor = colorResource(id = R.color.white),
+            content = { TitleSection(
+                title = title,
+                modifier = Modifier.padding(5.dp),
+                textAlign = TextAlign.Center,
+            ) },
+        )
+    }
+}
+@Composable
+fun TitleSection(title: String, modifier: Modifier = Modifier, textAlign: TextAlign){
     Text(
-        text = "Catégories",
+        text = title,
         modifier = modifier,
         textAlign = textAlign
     )
 }
 @Composable
-fun ScrollContent(innerPadding: PaddingValues) {
-    val categories = listOf(
-        Category("NOURRITURE", R.drawable.vector),
-        Category("FOURNITURE", R.drawable.fourniture),
-        Category("ELECTRONIQUE", R.drawable.electronique),
-        Category("MENAGER", R.drawable.menager),
-        Category("SOIN", R.drawable.ic_launcher_foreground),
-        Category("NOURRITURE", R.drawable.vector),
-        Category("FOURNITURE", R.drawable.fourniture),
-        Category("ELECTRONIQUE", R.drawable.electronique),
-        Category("MENAGER", R.drawable.menager),
-        Category("SOIN", R.drawable.ic_launcher_foreground),
-        Category("NOURRITURE", R.drawable.vector),
-        Category("FOURNITURE", R.drawable.fourniture),
-        Category("ELECTRONIQUE", R.drawable.electronique),
-        Category("MENAGER", R.drawable.menager),
-        Category("SOIN", R.drawable.ic_launcher_foreground),
-
-    )
+fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues) {
+    val categories = dataManager.readCategories()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         contentPadding = innerPadding,
@@ -179,11 +173,12 @@ fun CategoryCard(category: Category) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .padding(16.dp)
                 .fillMaxSize()
 
         ) {
-            Icon(painterResource(id = category.iconRes), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
+//            Icon(painterResource(id = category.iconRes), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
             Text(text = category.name)
         }
     }
@@ -191,8 +186,11 @@ fun CategoryCard(category: Category) {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun Preview1() {
+    // Crée une instance fictive de DataManager avec des données de test
+    val fakeDataManager = DataManager(null)
     GPROD80Theme {
-        MainScreen()
+        MainScreen1(fakeDataManager)
     }
 }
+
