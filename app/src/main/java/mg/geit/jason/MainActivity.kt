@@ -58,7 +58,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             GPROD80Theme {
                 MainScreen1(dataManager, seeListActivity =  { category ->
-                    val intent = Intent(this, ListProduitActivity::class.java).apply { putExtra("IdCategory", "${category.id}")}
+                    val intent = Intent(this, ListProductActivity::class.java).apply { putExtra("IdCategory", "${category.id}")}
                     Log.i("clickCard","CardClické: ${category.name}")
                     startActivity(intent)
                 })
