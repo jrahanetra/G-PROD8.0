@@ -12,7 +12,7 @@
     <loaded-nodes />
   </component>
   <component name="DBNavigator.Project.DatabaseConsoleManager">
-    <connection id="947830f6-2413-484a-a46f-1a423e5545ca">
+    <connection id="52518e33-91c3-41c4-afdf-12833e5aa380">
       <console name="Connection" type="STANDARD" schema="" session="Main" />
     </connection>
   </component>
@@ -23,10 +23,7 @@
     <open-files />
   </component>
   <component name="DBNavigator.Project.DatabaseSessionManager">
-    <connection id="947830f6-2413-484a-a46f-1a423e5545ca" />
-  </component>
-  <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="947830f6-2413-484a-a46f-1a423e5545ca" dataset="main.ProduitCategorie" active-filter-id="EMPTY_FILTER" />
+    <connection id="52518e33-91c3-41c4-afdf-12833e5aa380" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
@@ -45,7 +42,7 @@
   </component>
   <component name="DBNavigator.Project.Settings">
     <connections>
-      <connection id="947830f6-2413-484a-a46f-1a423e5545ca" active="true" signed="true">
+      <connection id="52518e33-91c3-41c4-afdf-12833e5aa380" active="true" signed="true">
         <database>
           <name value="Connection" />
           <description value="" />
@@ -62,7 +59,7 @@
           <tns-folder value="" />
           <tns-profile value="" />
           <files>
-            <file path="$USER_HOME$/G-PROD8.db" schema="main" />
+            <file path="$USER_HOME$/new.db" schema="main" />
           </files>
           <type value="NONE" />
           <user value="" />
