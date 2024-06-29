@@ -50,7 +50,7 @@ fun MainScreen2(dataManager: DataManager){
             }
         },
     ){  innerPadding ->
-        ScrollContent(dataManager, innerPadding)
+        ScrollContent(dataManager, innerPadding, seeListActivity = {})
     }
 }
 
