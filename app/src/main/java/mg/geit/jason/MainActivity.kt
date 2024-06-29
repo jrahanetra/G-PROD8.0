@@ -189,6 +189,9 @@ fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeList
         columns = GridCells.Fixed(2),
         contentPadding = innerPadding,
         modifier = Modifier.background(color = Color.White)
+            .fillMaxHeight()
+            .fillMaxWidth()
+            .fillMaxSize()
     ) {
         items(categories){ category ->
             run {
