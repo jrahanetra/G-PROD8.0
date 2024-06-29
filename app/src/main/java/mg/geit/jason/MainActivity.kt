@@ -53,17 +53,13 @@ class MainActivity : ComponentActivity() {
     private var dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dataManager.insertCatProduit("NOURRITURE", R.drawable.vector)
-        dataManager.insertCatProduit("FOURNITURE", R.drawable.fourniture)
-        dataManager.insertCatProduit("ELECTRONIQUE", R.drawable.electronique)
-        dataManager.insertCatProduit("MENAGER", R.drawable.menager)
-        dataManager.insertCatProduit("SOIN", R.drawable.ic_launcher_foreground)
+//        insertionData(dataManager)
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
-                MainScreen1(dataManager, seeListActivity = {
-                    val intent = Intent(this, ListProduitActivity::class.java)
-                    Log.i("clickCard","CardClické")
+                MainScreen1(dataManager, seeListActivity =  { category ->
+                    val intent = Intent(this, ListProduitActivity::class.java).apply { putExtra("IdCategory", "${category.id}")}
+                    Log.i("clickCard","CardClické: ${category.name}")
                     startActivity(intent)
                 })
             }
@@ -71,9 +67,43 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+fun insertionData(dataManager: DataManager){
+    Log.i("insertions", "Insertion data invoked")
+    dataManager.insertCatProduit("NOURRITURE", R.drawable.vector)
+    dataManager.insertCatProduit("FOURNITURE", R.drawable.fourniture)
+    dataManager.insertCatProduit("ELECTRONIQUE", R.drawable.electronique)
+    dataManager.insertCatProduit("MENAGER", R.drawable.menager)
+    dataManager.insertCatProduit("SOIN", R.drawable.ic_launcher_foreground)
+    // Produits pour la catégorie "NOURRITURE" (catégorie ID = 1)
+    dataManager.insertProduit("Burger", 400, 20, "C est un fast food", 1)
+    dataManager.insertProduit("Pizza", 500, 30, "Délicieux et gourmand", 1)
+    dataManager.insertProduit("Gâteau", 1000, 10, "Sucré et délicieux, parfait pour un anniversaire", 1)
+    dataManager.insertProduit("Sandwich", 250, 50, "Rapide et pratique pour le déjeuner", 1)
+
+    // Produits pour la catégorie "FOURNITURE" (catégorie ID = 2)
+    dataManager.insertProduit("Cahier", 20, 500, "Solide et durable, idéal pour les étudiants", 2)
+    dataManager.insertProduit("Stylo", 5, 1000, "Écriture fluide, disponible en plusieurs couleurs", 2)
+    dataManager.insertProduit("Sac à dos", 1500, 100, "Confortable et spacieux pour transporter vos affaires", 2)
+
+    // Produits pour la catégorie "ELECTRONIQUE" (catégorie ID = 3)
+    dataManager.insertProduit("Téléphone", 30000, 15, "Smartphone dernière génération avec écran OLED", 3)
+    dataManager.insertProduit("Ordinateur portable", 70000, 10, "Puissant et léger, parfait pour le travail et les loisirs", 3)
+    dataManager.insertProduit("Casque audio", 2000, 50, "Son de haute qualité avec réduction de bruit", 3)
+
+    // Produits pour la catégorie "MENAGER" (catégorie ID = 4)
+    dataManager.insertProduit("Aspirateur", 5000, 20, "Efficace pour nettoyer tous types de sols", 4)
+    dataManager.insertProduit("Machine à laver", 25000, 5, "Capacité de 7 kg avec plusieurs modes de lavage", 4)
+    dataManager.insertProduit("Réfrigérateur", 40000, 8, "Grand espace de rangement avec congélateur intégré", 4)
+
+    // Produits pour la catégorie "SOIN" (catégorie ID = 5)
+    dataManager.insertProduit("Shampooing", 150, 100, "Pour des cheveux propres et soyeux", 5)
+    dataManager.insertProduit("Crème hydratante", 300, 50, "Hydrate et nourrit la peau en profondeur", 5)
+    dataManager.insertProduit("Dentifrice", 50, 200, "Protection complète pour des dents saines et blanches", 5)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen1(dataManager: DataManager, seeListActivity: () -> Unit) {
+fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -94,6 +124,7 @@ fun MainScreen1(dataManager: DataManager, seeListActivity: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Header(title: String){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -152,7 +183,7 @@ fun TitleSection(title: String, modifier: Modifier = Modifier, textAlign: TextAl
 }
 
 @Composable
-fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeListActivity: () -> Unit) {
+fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeListActivity: (Category) -> Unit) {
     val categories = dataManager.readCategories()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -168,14 +199,14 @@ fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeList
 }
 
 @Composable
-fun CategoryCard(category: Category, seeListActivity: () -> Unit) {
+fun CategoryCard(category: Category, seeListActivity: (Category) -> Unit) {
     val idColor = listOf(R.color.color1, R.color.color2, R.color.color3, R.color.color4)
     Card(
         modifier = Modifier
             .padding(8.dp)
             .fillMaxHeight()
             .fillMaxWidth()
-            .clickable { seeListActivity()},
+            .clickable { seeListActivity(category) },
         colors = CardDefaults.cardColors(colorResource(idColor.random())),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
