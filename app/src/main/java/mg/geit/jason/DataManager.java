@@ -36,11 +36,13 @@ public class DataManager extends SQLiteOpenHelper {
         db.execSQL(newStrSql);
         Log.i("DataBase", "onCreate invoked");
     }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
     }
-    public void insertProduit(String name, int prix, int qtt, String description, int id_CatProduit)
+
+    public void insertProduct(String name, int prix, int qtt, String description, int id_CatProduit)
     {
         String strSql = "Insert into Produits (name_Produit, prix_Produit, quantite_Produit, description_Produit,id_Categorie) values" +
                 "('"+name+"',"+prix+","+qtt+",'"+description+"',"+id_CatProduit+")";
@@ -49,7 +51,7 @@ public class DataManager extends SQLiteOpenHelper {
         Log.i("DataBase", "insertProduit invoked ");
     }
 
-    public  void insertCatProduit(String name_Cat, int image_Cat){
+    public  void insertCatProduct(String name_Cat, int image_Cat){
         String strSql = "Insert into ProduitCategorie (name_Categorie, icon_Categorie) values"+
                 "('"+name_Cat+"',"+image_Cat+")";
         SQLiteDatabase  db = this.getWritableDatabase();
@@ -57,7 +59,7 @@ public class DataManager extends SQLiteOpenHelper {
         Log.i("DataBase", "insertCatégories invoked ");
     }
 
-    public List<Category> readCategories(){
+    public List<Category> readCategory(){
         List<Category> listCat = new ArrayList<>();
 
         String strSql = "Select * from ProduitCategorie";
@@ -74,7 +76,7 @@ public class DataManager extends SQLiteOpenHelper {
         return listCat;
     }
 
-    public List<Produit> readProduits(Integer id){
+    public List<Produit> readProducts(Integer id){
         List<Produit> listProduit = new ArrayList<>();
 
         String strSql = "Select * from Produits where id_Categorie = "+id+";";
@@ -82,11 +84,29 @@ public class DataManager extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         while(! cursor.isAfterLast()){
-            Produit produit = new Produit(cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(4));
+            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(4));
             listProduit.add(produit);
             cursor.moveToNext();
         }
         cursor.close();
         return listProduit;
+    }
+
+    public Produit readProduct(Integer idProduct){
+        String strSql = "Select * from Produits where id_Produit = "+idProduct+"";
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(strSql, null);
+        Produit produit = null;
+        if(cursor != null && cursor.moveToFirst())
+            // Le curseur contient des données, on peut les lire
+            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(4));
+        else
+            Log.i("Database","le curseur ne contient pas de donnee");
+
+        // Fermer le curseur et la base de données
+        if (cursor != null)
+            cursor.close();
+        db.close();
+        return  produit;
     }
 }
