@@ -35,7 +35,9 @@ class CategoryRegistrationActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen5(doModification:(Produit)->Unit){
+fun MainScreen5(
+    doModification:(Produit)->Unit
+){
     val produit = Produit(null,"",null,null,"")
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
@@ -82,6 +84,7 @@ fun MainScreen5(doModification:(Produit)->Unit){
             onDescriptionChange = { description = it })
     }
 }
+
 @Preview(showBackground = true)
 @Composable
 fun Preview3(){
