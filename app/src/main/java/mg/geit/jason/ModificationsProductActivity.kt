@@ -61,32 +61,76 @@ class ModificationsProductActivity : ComponentActivity() {
             GPROD80Theme {
                 MainScreen4(
                     product,
-                    doModification = {}
+                    doModification = {},
+                    dataManager
                 )
             }
         }
     }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen4(produit: Produit, doModification:(Produit)->Unit){
+fun MainScreen4(produit: Produit, doModification:(Produit)->Unit, dataManager: DataManager){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
+    //Déclarer les états pour chaque champ de text
+    var name by remember { mutableStateOf(produit.name) }
+    var prix by remember { mutableStateOf(produit.prix.toString()) }
+    var quantite by remember { mutableStateOf(produit.quantite.toString()) }
+    var description by remember { mutableStateOf(produit.description) }
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             Header(title = "Edit", false, produit, doModification)
         },
         floatingActionButton = {
-            CustomExtendedFloatingActionButton1()
+            CustomExtendedFloatingActionButton1("SOUMETTRE"){
+                // Traitements des données de champs
+                produit.id?.let { dataManager.updateProduct(it, name, prix.toInt(), quantite.toInt(), description ) }
+                // Vous pouvez également mettre à jour les données du produit et appeler doModification
+                val modifiedProduit = produit.copy(
+                    name = name,
+                    prix = prix.toDoubleOrNull() ?: produit.prix,
+                    quantite = quantite.toIntOrNull() ?: produit.quantite,
+                    description = description
+                )
+                doModification(modifiedProduit)
+            }
         },
-    ) { innerPadding ->
-        ContainerFields(produit, innerPadding)
+    )
+    { innerPadding ->
+        ContainerFields(
+            produit,
+            innerPadding,
+            false,
+            name = name,
+            onNameChange = { name = it },
+            prix = prix,
+            onPrixChange = { prix = it },
+            quantite = quantite,
+            onQuantiteChange = { quantite = it },
+            description = description,
+            onDescriptionChange = { description = it }
+        )
     }
 }
 
-
 @Composable
-fun ContainerFields(produit: Produit, innerPadding: PaddingValues){
+fun ContainerFields(
+    produit: Produit,
+    innerPadding: PaddingValues,
+    displayEmptyFields: Boolean,
+    name: String,
+    onNameChange: (String) -> Unit,
+    prix: String,
+    onPrixChange: (String) -> Unit,
+    quantite: String,
+    onQuantiteChange: (String) -> Unit,
+    description: String,
+    onDescriptionChange: (String) -> Unit)
+{
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -109,54 +153,104 @@ fun ContainerFields(produit: Produit, innerPadding: PaddingValues){
                     .background(color = Color.White)
                     .fillMaxHeight(),
             ){
-                item { run {DisplayFields(produit) } }
+                item {
+                    DisplayFields(
+                        produit,
+                        displayEmptyFields,
+                        name = name,
+                        onNameChange = onNameChange,
+                        prix = prix,
+                        onPrixChange = onPrixChange,
+                        quantite = quantite,
+                        onQuantiteChange = onQuantiteChange,
+                        description = description,
+                        onDescriptionChange = onDescriptionChange
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun DisplayFields(produit: Produit){
+fun DisplayFields(
+    produit: Produit,
+    displayEmptyFields: Boolean,
+    name: String,
+    onNameChange: (String) -> Unit,
+    prix: String,
+    onPrixChange: (String) -> Unit,
+    quantite: String,
+    onQuantiteChange: (String) -> Unit,
+    description: String,
+    onDescriptionChange: (String) -> Unit
+
+){
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ){
-        Column(
-            modifier = Modifier
-                .padding(0.dp, 16.dp, 0.dp, 20.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
-        ){
-            Text(
-                text = produit.name,
-                color = Color.Black,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold
-            )
+        if(!displayEmptyFields) {
+            Column(
+                modifier = Modifier
+                    .padding(0.dp, 16.dp, 0.dp, 20.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ){
+                Text(
+                    text = produit.name,
+                    color = Color.Black,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            DisplayField("NomProduit", name, onNameChange)
+            DisplayField("Prix", prix, onPrixChange)
+            DisplayField("Quantité", quantite, onQuantiteChange)
+            DisplayField("Description", description, onDescriptionChange)
         }
-        DisplayField("Name", produit.name )
-        DisplayField("Prix", produit.prix.toString())
-        DisplayField("Quantité", produit.quantite.toString())
-        DisplayField("Description", produit.description)
+        else{
+            Column(
+                modifier = Modifier
+                    .padding(0.dp, 16.dp, 0.dp, 20.dp)
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+            ){
+                Text(
+                    text = "Nouveau Catégorie",
+                    color = Color.Black,
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            DisplayField("NomCatégorie", "") {}
+            DisplayField("IconCatégorie", "") {}
+        }
     }
 }
 
 @Composable
-fun DisplayField(name: String, data: String){
+fun DisplayField(
+    name: String,
+    data: String,
+    onValueChange: (String) -> Unit
+){
     Column(
         modifier = Modifier
             .padding(16.dp, 5.dp, 0.dp, 0.dp)
             .fillMaxSize()
     ){
-        TextFieldWithIconsEdit(name, data)
+        TextFieldWithIconsEdit(name, data, onValueChange)
     }
 }
+
 @Composable
-fun CustomExtendedFloatingActionButton1() {
+fun CustomExtendedFloatingActionButton1(title: String, onClick:()-> Unit) {
     ExtendedFloatingActionButton(
-        onClick = { /* TODO */ },
+        onClick = { onClick() },
         containerColor = colorResource(id = R.color.green), // Couleur de fond personnalisée
         shape = RoundedCornerShape(6.dp),
         modifier = Modifier
@@ -164,13 +258,13 @@ fun CustomExtendedFloatingActionButton1() {
             .height(56.dp) // Hauteur du bouton
             .fillMaxWidth() // Remplit toute la largeur disponible
     ) {
-        Text("SOUMETTRE",
+        Text(title,
             fontSize = 20.sp) // Texte du bouton
     }
 }
 
 @Composable
-fun TextFieldWithIconsEdit(name: String, data: String) {
+fun TextFieldWithIconsEdit(name: String, data: String, onValueChange: (String) -> Unit) {
     var text by remember { mutableStateOf(TextFieldValue(data)) }
     OutlinedTextField(
         value = text,
@@ -184,6 +278,7 @@ fun TextFieldWithIconsEdit(name: String, data: String) {
                       },
         onValueChange = {
             text = it
+            onValueChange(it.text)
         },
         modifier = Modifier.width(320.dp),
         label = { Text(
@@ -194,3 +289,4 @@ fun TextFieldWithIconsEdit(name: String, data: String) {
         colors = OutlinedTextFieldDefaults.colors(Color.Black)
     )
 }
+

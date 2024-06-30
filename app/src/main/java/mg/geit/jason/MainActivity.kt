@@ -51,7 +51,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import mg.geit.jason.ui.theme.GPROD80Theme
 
@@ -73,6 +72,10 @@ class MainActivity : ComponentActivity() {
                     },
                     produit = Produit(null,"",null,null,"null"),
                     doModification = {Log.i("Debug", "doModification INVOKED")},
+                    goToRegistrationCategory = {
+                        val intent = Intent(this, CategoryRegistrationActivity::class.java)
+                        startActivity(intent)
+                    }
                 )
             }
         }
@@ -114,7 +117,7 @@ fun insertionData(dataManager: DataManager){
 }
 
 @Composable
-fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit, produit: Produit, doModification: (Produit) -> Unit) {
+fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit, produit: Produit, doModification: (Produit) -> Unit, goToRegistrationCategory: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -127,7 +130,7 @@ fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit, p
             )
         },
         floatingActionButton = {
-            ShowFloatingActionButton()
+            ShowFloatingActionButton(goToRegistrationCategory)
         },
     ) { innerPadding ->
         ScrollContent(dataManager, innerPadding, seeListActivity)
@@ -135,9 +138,9 @@ fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit, p
 }
 
 @Composable
-fun ShowFloatingActionButton(){
+fun ShowFloatingActionButton(goToRegistrationCategory:()->Unit){
     FloatingActionButton(
-        onClick = { /* TODO */ },
+        onClick = { goToRegistrationCategory() },
         containerColor = colorResource(id = R.color.color1),// Couleur de fond personnalis
         shape = FloatingActionButtonDefaults.largeShape,
         modifier = Modifier.padding(0.dp,0.dp,8.dp,0.dp)
@@ -216,8 +219,7 @@ fun TitleSection(title: String, modifier: Modifier = Modifier, textAlign: TextAl
         horizontalAlignment = Alignment.CenterHorizontally,
 
     ) {
-        Row(
-        ){
+        Row {
             Text(
                 text = title,
                 modifier = modifier
@@ -287,9 +289,9 @@ fun CategoryCard(category: Category, seeListActivity: (Category) -> Unit) {
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-fun Preview(){
-    GPROD80Theme {
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun Preview(){
+//    GPROD80Theme {
+//    }
+//}

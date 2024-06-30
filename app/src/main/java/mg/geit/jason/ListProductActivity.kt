@@ -75,6 +75,10 @@ class ListProductActivity : ComponentActivity() {
                     },
                     product = Produit(null,"",null,null,""),
                     doModification = {Log.i("Debug", "doModification INVOKED")},
+                    goToRegistrationProduit = {
+                        val intent = Intent(this, CategoryRegistrationActivity::class.java)
+                        startActivity(intent)
+                    }
                 )
             }
         }
@@ -83,7 +87,7 @@ class ListProductActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen2(list: List<Produit>, seeDetailsProduct: (Produit) -> Unit, product: Produit, doModification: (Produit) -> Unit){
+fun MainScreen2(list: List<Produit>, seeDetailsProduct: (Produit) -> Unit, product: Produit, doModification: (Produit) -> Unit, goToRegistrationProduit:()->Unit){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -96,7 +100,7 @@ fun MainScreen2(list: List<Produit>, seeDetailsProduct: (Produit) -> Unit, produ
                 )
         },
         floatingActionButton = {
-            ShowFloatingActionButton()
+            ShowFloatingActionButton(goToRegistrationProduit)
         },
     ) { innerPadding ->
         ScrollDataProduct(list, innerPadding, seeDetailsProduct)
