@@ -1,6 +1,11 @@
 package mg.geit.jason
 
+import android.app.Activity
+import android.app.Activity.RESULT_OK
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -42,26 +47,64 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mg.geit.jason.ui.theme.GPROD80Theme
 
-class ModificationsProductActivity : ComponentActivity() {
+class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefreshListener {
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.layout)
 
         val idProduct = intent.getIntExtra("idProduit", 0)
         val product = dataManager.readProduct(idProduct)
         enableEdgeToEdge()
-        setContent{
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        val composeView: ComposeView = findViewById(R.id.composeView)
+
+        swipeRefreshLayout.setOnRefreshListener(this)
+
+        composeView.setContent {
             GPROD80Theme {
                 MainScreen4(
+                    this,
                     product,
-                    doModification = {},
+                    doModification = {refreshData()},
+                    dataManager
+                )
+            }
+        }
+        swipeRefreshLayout.setOnRefreshListener(this)
+    }
+
+    override fun onRefresh() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            Toast.makeText(this, "Refreshed", Toast.LENGTH_LONG).show()
+            refreshData()
+            swipeRefreshLayout.isRefreshing = false
+        }, 300)
+    }
+
+    private fun refreshData() {
+        val idProduct = intent.getIntExtra("idProduit", 0)
+        val product = dataManager.readProduct(idProduct)
+        setContent {
+            GPROD80Theme {
+                MainScreen4(
+                    this,
+                    product,
+                    doModification = {
+                        // Vous pouvez appeler la méthode pour mettre à jour l'activité ici
+                        refreshData()
+                    },
                     dataManager
                 )
             }
@@ -71,7 +114,12 @@ class ModificationsProductActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen4(produit: Produit, doModification:(Produit)->Unit, dataManager: DataManager){
+fun MainScreen4(
+    activity: Activity,
+    produit: Produit,
+    doModification:(Produit)->Unit,
+    dataManager: DataManager
+){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     //Déclarer les états pour chaque champ de text
@@ -97,6 +145,9 @@ fun MainScreen4(produit: Produit, doModification:(Produit)->Unit, dataManager: D
                     description = description
                 )
                 doModification(modifiedProduit)
+                //Retourner un résultat à l'activité précédente
+                activity.setResult(RESULT_OK)
+                activity.finish()
             }
         },
     )
@@ -248,7 +299,10 @@ fun DisplayField(
 }
 
 @Composable
-fun CustomExtendedFloatingActionButton1(title: String, onClick:()-> Unit) {
+fun CustomExtendedFloatingActionButton1(
+    title: String,
+    onClick:()-> Unit
+) {
     ExtendedFloatingActionButton(
         onClick = { onClick() },
         containerColor = colorResource(id = R.color.green), // Couleur de fond personnalisée
@@ -264,7 +318,11 @@ fun CustomExtendedFloatingActionButton1(title: String, onClick:()-> Unit) {
 }
 
 @Composable
-fun TextFieldWithIconsEdit(name: String, data: String, onValueChange: (String) -> Unit) {
+fun TextFieldWithIconsEdit(
+    name: String,
+    data: String,
+    onValueChange: (String) -> Unit
+) {
     var text by remember { mutableStateOf(TextFieldValue(data)) }
     OutlinedTextField(
         value = text,
