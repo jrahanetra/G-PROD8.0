@@ -51,6 +51,19 @@ public class DataManager extends SQLiteOpenHelper {
         Log.i("DataBase", "insertProduit invoked ");
     }
 
+    public void updateProduct(int id, String name, int prix, int qtt, String description) {
+        String strSql = "UPDATE Produits SET " +
+                "name_Produit = '" + name + "', " +
+                "prix_Produit = " + prix + ", " +
+                "quantite_Produit = " + qtt + ", " +
+                "description_Produit = '" + description +"' "+
+                "WHERE id_Produit = " + id;
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(strSql);
+        Log.i("DataBase", "updateProduct invoked for id_Produit: " + id);
+    }
+
     public  void insertCatProduct(String name_Cat, int image_Cat){
         String strSql = "Insert into ProduitCategorie (name_Categorie, icon_Categorie) values"+
                 "('"+name_Cat+"',"+image_Cat+")";
