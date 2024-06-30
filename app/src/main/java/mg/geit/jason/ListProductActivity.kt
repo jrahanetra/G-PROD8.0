@@ -1,5 +1,6 @@
 package mg.geit.jason
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -9,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,13 +26,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedCard
@@ -48,9 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mg.geit.jason.ui.theme.GPROD80Theme
@@ -60,15 +59,23 @@ class ListProductActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val idCategory = intent.getStringExtra("IdCategory")
+        val idCategory = intent.getIntExtra("IdCategory", 0)
         Log.i("Debug", "$idCategory")
-        val id = idCategory?.toInt()
-        val products = dataManager.readProduits(id)
+        val products = dataManager.readProducts(idCategory)
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
                 Log.i("ListData", "$products")
-                MainScreen2(products)
+                MainScreen2(
+                    products,
+                    seeDetailsProduct = { produit ->
+                        val intent = Intent(this, DetailsProductActivity::class.java)
+                                        .apply { putExtra("idProduit", produit.id) }
+                        startActivity(intent)
+                    },
+                    product = Produit(null,"",null,null,""),
+                    doModification = {Log.i("Debug", "doModification INVOKED")},
+                )
             }
         }
     }
@@ -76,29 +83,28 @@ class ListProductActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen2(list: List<Produit>){
+fun MainScreen2(list: List<Produit>, seeDetailsProduct: (Produit) -> Unit, product: Produit, doModification: (Produit) -> Unit){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
-    Scaffold (
+    Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Header(title = "Lists")
-        } ,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { /* TODO */ },
-                containerColor = colorResource(id = R.color.color1),// Couleur de fond personnalis
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add")
-            }
+            Header(
+                title = "Listes",
+                false,
+                product,
+                doModification
+                )
         },
-    ){  innerPadding ->
-        ScrollDataProduct(list, innerPadding)
+        floatingActionButton = {
+            ShowFloatingActionButton()
+        },
+    ) { innerPadding ->
+        ScrollDataProduct(list, innerPadding, seeDetailsProduct)
     }
 }
 
 @Composable
-fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues){
+fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues, seeDetailsProduct: (Produit) -> Unit){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -114,6 +120,7 @@ fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues){
                 containerColor = Color.White,
             ),
             border = BorderStroke(1.dp, Color.Black), // Bordure transparente
+            shape = RoundedCornerShape(6.dp),
             modifier = Modifier
                 .size(width = 350.dp, height = 600.dp)
         ) {
@@ -125,22 +132,7 @@ fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues){
             ) {
                 items(list) { product ->
                     run {
-                        ShowProduct(product)
-                    }
-                }
-                items(list) { product ->
-                    run {
-                        ShowProduct(product)
-                    }
-                }
-                items(list) { product ->
-                    run {
-                        ShowProduct(product)
-                    }
-                }
-                items(list) { product ->
-                    run {
-                        ShowProduct(product)
+                        ShowProduct(product, seeDetailsProduct)
                     }
                 }
             }
@@ -149,7 +141,7 @@ fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues){
 }
 
 @Composable
-fun ShowProduct(product: Produit){
+fun ShowProduct(product: Produit, seeDetailsProduct: (Produit)-> Unit){
     var checked by remember { mutableStateOf(true) }
     OutlinedCard(
         colors = CardDefaults.cardColors(
@@ -158,29 +150,29 @@ fun ShowProduct(product: Produit){
         border = BorderStroke(0.dp, Color.Transparent), // Bordure transparente
         modifier = Modifier
             .size(width = 600.dp, height = 50.dp)
+            .clickable { seeDetailsProduct(product) },
     ){
         Row(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(0.dp),
             verticalAlignment = Alignment.CenterVertically
-
         )  {
-                Checkbox(
-                    checked = checked,
-                    onCheckedChange = { checked = it },
-                    modifier = Modifier
-                        .padding(10.dp, 26.dp, 0.dp, 26.dp)
-                        .size(30.dp)
-                )
-                Text(
-                    text = product.name,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    color = Color.Black,
-                    style = typography.titleLarge,
-                    fontSize = 20.sp
-                )
+            Checkbox(
+                checked = checked,
+                onCheckedChange = { checked = it },
+                modifier = Modifier
+                    .padding(10.dp, 26.dp, 0.dp, 26.dp)
+                    .size(30.dp)
+            )
+            Text(
+                text = product.name,
+                modifier = Modifier
+                    .fillMaxWidth(),
+                color = Color.Black,
+                style = typography.titleLarge,
+                fontSize = 20.sp
+            )
         }
     }
 }
@@ -200,10 +192,11 @@ fun TextFieldWithIcons() {
         placeholder = { Text(text = "Entrer le nom du produit") },
     )
 }
-@Preview (showBackground = true)
-@Composable
-fun Preview2() {
-    GPROD80Theme {
-        ShowProduct(product = Produit("mon produit", 100, 200, "Rien à montrer pour l'instant"))
-    }
-}
+
+//@Preview (showBackground = true)
+//@Composable
+//fun Preview2() {
+//    GPROD80Theme {
+//        ShowProduct(product = Produit("mon produit", 100, 200, "Rien à montrer pour l'instant"), )
+//    }
+//}
