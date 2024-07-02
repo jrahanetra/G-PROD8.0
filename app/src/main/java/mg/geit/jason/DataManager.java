@@ -21,7 +21,7 @@ public class DataManager extends SQLiteOpenHelper {
         String strSql = "Create TABLE ProduitCategorie (" +
                 "id_Categorie integer primary key autoincrement, " +
                 "name_Categorie text not null," +
-                "icon_Categorie integer not null"+
+                "image_CategorieUrl text not null"+
                 ")";
         String newStrSql = "Create Table Produits  (" +
                 "id_Produit integer primary key autoincrement," +
@@ -64,9 +64,9 @@ public class DataManager extends SQLiteOpenHelper {
         Log.i("DataBase", "updateProduct invoked for id_Produit: " + id);
     }
 
-    public  void insertCatProduct(String name_Cat, int image_Cat){
-        String strSql = "Insert into ProduitCategorie (name_Categorie, icon_Categorie) values"+
-                "('"+name_Cat+"',"+image_Cat+")";
+    public  void insertCatProduct(String name_Cat, String image_CatUrl){
+        String strSql = "Insert into ProduitCategorie (name_Categorie, image_CategorieUrl) values"+
+                "('"+name_Cat+"','"+image_CatUrl+"')";
         SQLiteDatabase  db = this.getWritableDatabase();
         db.execSQL(strSql);
         Log.i("DataBase", "insertCatégories invoked ");
@@ -81,7 +81,7 @@ public class DataManager extends SQLiteOpenHelper {
 
         while(! cursor.isAfterLast())
         {
-            Category categoryData = new Category(cursor.getInt(0),cursor.getString(1), cursor.getInt(2));
+            Category categoryData = new Category(cursor.getInt(0),cursor.getString(1), cursor.getString(2));
             listCat.add(categoryData);
             cursor.moveToNext();
         }
@@ -106,7 +106,7 @@ public class DataManager extends SQLiteOpenHelper {
     }
 
     public Produit readProduct(Integer idProduct){
-        String strSql = "Select * from Produits where id_Produit = "+idProduct+"";
+        String strSql = "Select * from Produits where id_Produit = "+idProduct;
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(strSql, null);
         Produit produit = null;
