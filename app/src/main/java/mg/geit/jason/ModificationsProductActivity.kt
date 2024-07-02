@@ -85,7 +85,8 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
         swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    override fun onRefresh() {
+    override fun onRefresh()
+    {
         Handler(Looper.getMainLooper()).postDelayed({
             Toast.makeText(this, "Refreshed", Toast.LENGTH_LONG).show()
             refreshData()
@@ -93,7 +94,8 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
         }, 300)
     }
 
-    private fun refreshData() {
+    private fun refreshData()
+    {
         val idProduct = intent.getIntExtra("idProduit", 0)
         val product = dataManager.readProduct(idProduct)
         setContent {
