@@ -312,7 +312,7 @@ fun CategoryCard(
                 .fillMaxSize()
 
         ) {
-            Icon(painterResource(id = category.image), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
+            Icon(painterResource(id = category.image!!.toInt()), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
             Text(text = category.name.toString())
         }
     }
