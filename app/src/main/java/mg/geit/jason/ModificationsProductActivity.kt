@@ -208,8 +208,6 @@ fun ContainerFields(
             ){
                 item {
                     DisplayFields(
-                        produit,
-                        displayEmptyFields,
                         name = name,
                         onNameChange = onNameChange,
                         prix = prix,
@@ -227,8 +225,6 @@ fun ContainerFields(
 
 @Composable
 fun DisplayFields(
-    produit: Produit,
-    displayEmptyFields: Boolean,
     name: String,
     onNameChange: (String) -> Unit,
     prix: String,
@@ -244,44 +240,10 @@ fun DisplayFields(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ){
-        if(!displayEmptyFields) {
-            Column(
-                modifier = Modifier
-                    .padding(0.dp, 16.dp, 0.dp, 20.dp)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ){
-                Text(
-                    text = produit.name,
-                    color = Color.Black,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            DisplayField("NomProduit", name, onNameChange)
-            DisplayField("Prix", prix, onPrixChange)
-            DisplayField("Quantité", quantite, onQuantiteChange)
-            DisplayField("Description", description, onDescriptionChange)
-        }
-        else{
-            Column(
-                modifier = Modifier
-                    .padding(0.dp, 16.dp, 0.dp, 20.dp)
-                    .fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ){
-                Text(
-                    text = "Nouveau Catégorie",
-                    color = Color.Black,
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            DisplayField("NomCatégorie", "") {}
-            DisplayField("IconCatégorie", "") {}
-        }
+        DisplayField("NomProduit", name, onNameChange)
+        DisplayField("Prix", prix, onPrixChange)
+        DisplayField("Quantité", quantite, onQuantiteChange)
+        DisplayField("Description", description, onDescriptionChange)
     }
 }
 
