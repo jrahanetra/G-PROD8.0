@@ -87,7 +87,12 @@ class ListProductActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen2(list: List<Produit>, seeDetailsProduct: (Produit) -> Unit, product: Produit, doModification: (Produit) -> Unit, goToRegistrationProduit:()->Unit){
+fun MainScreen2(
+    list: List<Produit>,
+    seeDetailsProduct: (Produit) -> Unit,
+    product: Produit, doModification: (Produit) -> Unit,
+    goToRegistrationProduit:()->Unit
+){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -108,7 +113,11 @@ fun MainScreen2(list: List<Produit>, seeDetailsProduct: (Produit) -> Unit, produ
 }
 
 @Composable
-fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues, seeDetailsProduct: (Produit) -> Unit){
+fun ScrollDataProduct(
+    list: List<Produit>,
+    innerPadding : PaddingValues,
+    seeDetailsProduct: (Produit) -> Unit
+){
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -145,7 +154,10 @@ fun ScrollDataProduct(list: List<Produit>, innerPadding : PaddingValues, seeDeta
 }
 
 @Composable
-fun ShowProduct(product: Produit, seeDetailsProduct: (Produit)-> Unit){
+fun ShowProduct(
+    product: Produit,
+    seeDetailsProduct: (Produit)-> Unit
+){
     var checked by remember { mutableStateOf(true) }
     OutlinedCard(
         colors = CardDefaults.cardColors(
@@ -182,7 +194,8 @@ fun ShowProduct(product: Produit, seeDetailsProduct: (Produit)-> Unit){
 }
 
 @Composable
-fun TextFieldWithIcons() {
+fun TextFieldWithIcons()
+{
     var text by remember { mutableStateOf(TextFieldValue("")) }
     OutlinedTextField(
         value = text,
