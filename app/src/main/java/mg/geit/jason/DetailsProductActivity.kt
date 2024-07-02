@@ -79,7 +79,8 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
         swipeRefreshLayout.setOnRefreshListener(this)
     }
 
-    override fun onRefresh() {
+    override fun onRefresh()
+    {
         Handler(Looper.getMainLooper()).postDelayed({
             Toast.makeText(this, "refresh", Toast.LENGTH_LONG).show()
             refreshData()
@@ -221,7 +222,8 @@ fun DetailsText(
 }
 
 @Composable
-fun CustomExtendedFloatingActionButton() {
+fun CustomExtendedFloatingActionButton()
+{
     ExtendedFloatingActionButton(
         onClick = { /* TODO */ },
         containerColor = colorResource(id = R.color.color5), // Couleur de fond personnalisée
