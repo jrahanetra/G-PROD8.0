@@ -8,6 +8,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,11 +48,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 import mg.geit.jason.ui.theme.GPROD80Theme
 
 class MainActivity : ComponentActivity() {
@@ -85,11 +90,11 @@ class MainActivity : ComponentActivity() {
 fun insertionData(dataManager: DataManager)
 {
     Log.i("insertions", "Insertion data invoked")
-    dataManager.insertCatProduct("NOURRITURE", R.drawable.vector)
-    dataManager.insertCatProduct("FOURNITURE", R.drawable.fourniture)
-    dataManager.insertCatProduct("ELECTRONIQUE", R.drawable.electronique)
-    dataManager.insertCatProduct("MENAGER", R.drawable.menager)
-    dataManager.insertCatProduct("SOIN", R.drawable.ic_launcher_foreground)
+    dataManager.insertCatProduct("NOURRITURE", "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
+    dataManager.insertCatProduct("FOURNITURE", "https://images.pexels.com/photos/159538/school-book-binder-folder-notebook-159538.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
+    dataManager.insertCatProduct("ELECTRONIQUE", "https://images.pexels.com/photos/6446709/pexels-photo-6446709.jpeg?auto=compress&cs=tinysrgb&w=600")
+    dataManager.insertCatProduct("MENAGER", "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
+    dataManager.insertCatProduct("SOIN", "https://images.pexels.com/photos/8154399/pexels-photo-8154399.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
     // Produits pour la catégorie "NOURRITURE" (catégorie ID = 1)
     dataManager.insertProduct("Burger", 400, 20, "C est un fast food", 1)
     dataManager.insertProduct("Pizza", 500, 30, "Délicieux et gourmand", 1)
@@ -312,7 +317,22 @@ fun CategoryCard(
                 .fillMaxSize()
 
         ) {
-            Icon(painterResource(id = category.image!!.toInt()), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
+            val painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current).data(data = category.imageUrl)
+                    .apply(block = fun ImageRequest.Builder.() {
+                        crossfade(true)
+                        transformations(CircleCropTransformation())
+                    }).build()
+            )
+
+            Image(
+                painter = painter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(128.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
             Text(text = category.name.toString())
         }
     }
