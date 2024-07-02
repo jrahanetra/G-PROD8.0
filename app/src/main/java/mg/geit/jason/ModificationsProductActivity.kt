@@ -104,7 +104,6 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
                     this,
                     product,
                     doModification = {
-                        // Vous pouvez appeler la méthode pour mettre à jour l'activité ici
                         refreshData()
                     },
                     dataManager
@@ -155,7 +154,6 @@ fun MainScreen4(
     )
     { innerPadding ->
         ContainerFields(
-            produit,
             innerPadding,
             false,
             name = name,
@@ -172,7 +170,6 @@ fun MainScreen4(
 
 @Composable
 fun ContainerFields(
-    produit: Produit,
     innerPadding: PaddingValues,
     displayEmptyFields: Boolean,
     name: String,
