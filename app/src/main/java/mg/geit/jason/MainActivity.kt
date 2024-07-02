@@ -58,8 +58,8 @@ class MainActivity : ComponentActivity() {
     private var dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        insertionData(dataManager)
         enableEdgeToEdge()
+//        insertionData(dataManager);
         setContent {
             GPROD80Theme {
                 MainScreen1(
@@ -82,7 +82,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun insertionData(dataManager: DataManager){
+fun insertionData(dataManager: DataManager)
+{
     Log.i("insertions", "Insertion data invoked")
     dataManager.insertCatProduct("NOURRITURE", R.drawable.vector)
     dataManager.insertCatProduct("FOURNITURE", R.drawable.fourniture)
@@ -116,8 +117,15 @@ fun insertionData(dataManager: DataManager){
     dataManager.insertProduct("Dentifrice", 50, 200, "Protection complète pour des dents saines et blanches", 5)
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit, produit: Produit, doModification: (Produit) -> Unit, goToRegistrationCategory: () -> Unit) {
+fun MainScreen1(
+    dataManager: DataManager,
+    seeListActivity: (Category) -> Unit,
+    produit: Produit,
+    doModification: (Produit) -> Unit,
+    goToRegistrationCategory: () -> Unit
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -138,7 +146,9 @@ fun MainScreen1(dataManager: DataManager, seeListActivity: (Category) -> Unit, p
 }
 
 @Composable
-fun ShowFloatingActionButton(goToRegistrationCategory:()->Unit){
+fun ShowFloatingActionButton(
+    goToRegistrationCategory:()->Unit
+){
     FloatingActionButton(
         onClick = { goToRegistrationCategory() },
         containerColor = colorResource(id = R.color.color1),// Couleur de fond personnalis
@@ -155,7 +165,12 @@ fun ShowFloatingActionButton(goToRegistrationCategory:()->Unit){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Header(title: String, editable: Boolean, produit: Produit, doModification:(Produit)->Unit){
+fun Header(
+    title: String,
+    editable: Boolean,
+    produit: Produit,
+    doModification:(Produit)->Unit
+){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Column {
         CenterAlignedTopAppBar(
@@ -210,7 +225,14 @@ fun Header(title: String, editable: Boolean, produit: Produit, doModification:(P
 }
 
 @Composable
-fun TitleSection(title: String, modifier: Modifier = Modifier, textAlign: TextAlign, editable: Boolean, produit: Produit, doModification: (Produit) -> Unit){
+fun TitleSection(
+    title: String,
+    modifier: Modifier = Modifier,
+    textAlign: TextAlign,
+    editable: Boolean,
+    produit: Produit,
+    doModification: (Produit) -> Unit
+){
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -244,7 +266,11 @@ fun TitleSection(title: String, modifier: Modifier = Modifier, textAlign: TextAl
 }
 
 @Composable
-fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeListActivity: (Category) -> Unit) {
+fun ScrollContent(
+    dataManager: DataManager,
+    innerPadding: PaddingValues,
+    seeListActivity: (Category) -> Unit
+) {
     val categories = dataManager.readCategory()
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -264,7 +290,10 @@ fun ScrollContent(dataManager: DataManager, innerPadding: PaddingValues, seeList
 }
 
 @Composable
-fun CategoryCard(category: Category, seeListActivity: (Category) -> Unit) {
+fun CategoryCard(
+    category: Category,
+    seeListActivity: (Category) -> Unit
+) {
     val idColor = listOf(R.color.color1, R.color.color2, R.color.color3, R.color.color4)
     Card(
         modifier = Modifier
@@ -284,7 +313,7 @@ fun CategoryCard(category: Category, seeListActivity: (Category) -> Unit) {
 
         ) {
             Icon(painterResource(id = category.image), contentDescription = null, tint = Color.Black, modifier = Modifier.align(Alignment.CenterHorizontally))
-            Text(text = category.name)
+            Text(text = category.name.toString())
         }
     }
 }
