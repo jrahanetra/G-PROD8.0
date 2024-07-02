@@ -2,7 +2,10 @@ package mg.geit.jason
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -33,22 +36,61 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mg.geit.jason.ui.theme.GPROD80Theme
 
-class DetailsProductActivity : ComponentActivity() {
+class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefreshListener{
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private var dataManager = DataManager(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.layout)
 
         val idProduct = intent.getIntExtra("idProduit",0)
         Log.i("Debug", "$idProduct")
         val product = dataManager.readProduct(idProduct)
         enableEdgeToEdge()
-        setContent {
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        val composeView : ComposeView = findViewById(R.id.composeView)
+
+        swipeRefreshLayout.setOnRefreshListener(this)
+
+        composeView.setContent {
+            GPROD80Theme {
+                Log.i("ProduitData", "$product")
+                MainScreen3(
+                    product,
+                    doModification = {product ->
+                        val intent = Intent(this, ModificationsProductActivity::class.java).apply {
+                            putExtra("idProduit", product.id)
+                        }
+                        Log.i("Coucou","Edit CLické")
+                        startActivity(intent)
+                    }
+                )
+            }
+        }
+        swipeRefreshLayout.setOnRefreshListener(this)
+    }
+
+    override fun onRefresh() {
+        Handler(Looper.getMainLooper()).postDelayed({
+            Toast.makeText(this, "refresh", Toast.LENGTH_LONG).show()
+            refreshData()
+            swipeRefreshLayout.isRefreshing = false
+        }, 500)
+    }
+
+    private fun refreshData(){
+        val idProduct = intent.getIntExtra("idProduit",0)
+        val product = dataManager.readProduct(idProduct)
+        setContent{
             GPROD80Theme {
                 Log.i("ProduitData", "$product")
                 MainScreen3(
@@ -68,7 +110,10 @@ class DetailsProductActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen3(produit: Produit, doModification:(Produit)-> Unit){
+fun MainScreen3(
+    produit: Produit,
+    doModification:(Produit)-> Unit
+){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -84,7 +129,10 @@ fun MainScreen3(produit: Produit, doModification:(Produit)-> Unit){
 }
 
 @Composable
-fun SeeDetailsProduit(produit: Produit, innerPadding: PaddingValues){
+fun SeeDetailsProduit(
+    produit: Produit,
+    innerPadding: PaddingValues
+){
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -114,7 +162,9 @@ fun SeeDetailsProduit(produit: Produit, innerPadding: PaddingValues){
 }
 
 @Composable
-fun DisplayDetails(produit: Produit){
+fun DisplayDetails(
+    produit: Produit
+){
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -122,7 +172,7 @@ fun DisplayDetails(produit: Produit){
     ){
         Column(
             modifier = Modifier
-                .padding(0.dp,16.dp,0.dp,20.dp)
+                .padding(0.dp, 16.dp, 0.dp, 20.dp)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
@@ -140,10 +190,13 @@ fun DisplayDetails(produit: Produit){
 }
 
 @Composable
-fun DetailsText(title: String, data: String){
+fun DetailsText(
+    title: String,
+    data: String
+){
     Column(
         modifier = Modifier
-            .padding(16.dp,5.dp,0.dp,0.dp)
+            .padding(16.dp, 5.dp, 0.dp, 0.dp)
             .fillMaxSize()
     ){
         Text(
@@ -155,7 +208,7 @@ fun DetailsText(title: String, data: String){
         )
         Column(
             modifier = Modifier
-                .padding(16.dp,5.dp,0.dp,0.dp)
+                .padding(16.dp, 5.dp, 0.dp, 0.dp)
                 .fillMaxSize(),
         ){
             Text(
@@ -174,7 +227,7 @@ fun CustomExtendedFloatingActionButton() {
         containerColor = colorResource(id = R.color.color5), // Couleur de fond personnalisée
         shape = RoundedCornerShape(6.dp),
         modifier = Modifier
-            .padding(35.dp,0.dp,0.dp,16.dp) // Ajoute une marge autour du bouton
+            .padding(35.dp, 0.dp, 0.dp, 16.dp) // Ajoute une marge autour du bouton
             .height(56.dp) // Hauteur du bouton
             .fillMaxWidth() // Remplit toute la largeur disponible
     ) {
