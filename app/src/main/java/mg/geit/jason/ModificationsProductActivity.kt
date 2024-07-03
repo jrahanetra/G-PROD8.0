@@ -122,11 +122,11 @@ fun MainScreen4(
     dataManager: DataManager
 ){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
     //Déclarer les états pour chaque champ de text
     var name by remember { mutableStateOf(produit.name) }
     var prix by remember { mutableStateOf(produit.prix.toString()) }
     var quantite by remember { mutableStateOf(produit.quantite.toString()) }
+    var imageUrl by remember { mutableStateOf(produit.imageUrl) }
     var description by remember { mutableStateOf(produit.description) }
 
     Scaffold(
@@ -137,12 +137,13 @@ fun MainScreen4(
         floatingActionButton = {
             CustomExtendedFloatingActionButton1("SOUMETTRE"){
                 // Traitements des données de champs
-                produit.id?.let { dataManager.updateProduct(it, name, prix.toInt(), quantite.toInt(), description ) }
+                produit.id?.let { dataManager.updateProduct(it, name, prix.toInt(), quantite.toInt(), imageUrl, description ) }
                 // Vous pouvez également mettre à jour les données du produit et appeler doModification
                 val modifiedProduit = produit.copy(
                     name = name,
                     prix = prix.toDoubleOrNull() ?: produit.prix,
                     quantite = quantite.toIntOrNull() ?: produit.quantite,
+                    imageUrl = imageUrl,
                     description = description
                 )
                 doModification(modifiedProduit)
@@ -155,7 +156,6 @@ fun MainScreen4(
     { innerPadding ->
         ContainerFields(
             innerPadding,
-            false,
             name = name,
             onNameChange = { name = it },
             prix = prix,
@@ -163,6 +163,8 @@ fun MainScreen4(
             quantite = quantite,
             onQuantiteChange = { quantite = it },
             description = description,
+            imageUrl = imageUrl,
+            onImageUrlChange = {imageUrl = it},
             onDescriptionChange = { description = it }
         )
     }
@@ -171,13 +173,14 @@ fun MainScreen4(
 @Composable
 fun ContainerFields(
     innerPadding: PaddingValues,
-    displayEmptyFields: Boolean,
     name: String,
     onNameChange: (String) -> Unit,
     prix: String,
     onPrixChange: (String) -> Unit,
     quantite: String,
     onQuantiteChange: (String) -> Unit,
+    imageUrl: String,
+    onImageUrlChange: (String) -> Unit,
     description: String,
     onDescriptionChange: (String) -> Unit)
 {
@@ -211,6 +214,8 @@ fun ContainerFields(
                         onPrixChange = onPrixChange,
                         quantite = quantite,
                         onQuantiteChange = onQuantiteChange,
+                        imageUrl = imageUrl,
+                        onImageUrlChange = onImageUrlChange,
                         description = description,
                         onDescriptionChange = onDescriptionChange
                     )
@@ -228,6 +233,8 @@ fun DisplayFields(
     onPrixChange: (String) -> Unit,
     quantite: String,
     onQuantiteChange: (String) -> Unit,
+    imageUrl: String,
+    onImageUrlChange: (String) -> Unit,
     description: String,
     onDescriptionChange: (String) -> Unit
 
@@ -240,6 +247,7 @@ fun DisplayFields(
         DisplayField("NomProduit", name, onNameChange)
         DisplayField("Prix", prix, onPrixChange)
         DisplayField("Quantité", quantite, onQuantiteChange)
+        DisplayField("ImageUrl", imageUrl, onImageUrlChange)
         DisplayField("Description", description, onDescriptionChange)
     }
 }
