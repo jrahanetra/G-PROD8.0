@@ -101,7 +101,7 @@ fun MainScreen5(
     thisActivity : Activity,
 ){
     val category = Category(null,null,null)
-    val produit = Produit(null, "", null, null, "")
+    val produit = Produit(null, "", null, null, "","")
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     //Déclarer les états pour chaque champ de text
@@ -202,6 +202,6 @@ fun DisplayFields1(
 @Composable
 fun Preview3(){
     GPROD80Theme {
-        val produit = Produit(null,"",null,null,"")
+        val produit = Produit(null,"",null,null,"","")
     }
 }
