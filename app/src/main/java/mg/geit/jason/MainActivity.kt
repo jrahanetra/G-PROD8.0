@@ -64,7 +64,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-//        insertionData(dataManager);
+//        insertionData(dataManager)
         setContent {
             GPROD80Theme {
                 MainScreen1(
@@ -75,7 +75,7 @@ class MainActivity : ComponentActivity() {
                         Log.i("clickCard","CardClické: ${categorie.name}")
                         startActivity(intent)
                     },
-                    produit = Produit(null,"",null,null,"null"),
+                    produit = Produit(null,"",null,null,"null",""),
                     doModification = {Log.i("Debug", "doModification INVOKED")},
                     goToRegistrationCategory = {
                         val intent = Intent(this, CategoryRegistrationActivity::class.java)
@@ -95,31 +95,33 @@ fun insertionData(dataManager: DataManager)
     dataManager.insertCatProduct("ELECTRONIQUE", "https://images.pexels.com/photos/6446709/pexels-photo-6446709.jpeg?auto=compress&cs=tinysrgb&w=600")
     dataManager.insertCatProduct("MENAGER", "https://images.pexels.com/photos/276583/pexels-photo-276583.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
     dataManager.insertCatProduct("SOIN", "https://images.pexels.com/photos/8154399/pexels-photo-8154399.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
-    // Produits pour la catégorie "NOURRITURE" (catégorie ID = 1)
-    dataManager.insertProduct("Burger", 400, 20, "C est un fast food", 1)
-    dataManager.insertProduct("Pizza", 500, 30, "Délicieux et gourmand", 1)
-    dataManager.insertProduct("Gâteau", 1000, 10, "Sucré et délicieux, parfait pour un anniversaire", 1)
-    dataManager.insertProduct("Sandwich", 250, 50, "Rapide et pratique pour le déjeuner", 1)
 
-    // Produits pour la catégorie "FOURNITURE" (catégorie ID = 2)
-    dataManager.insertProduct("Cahier", 20, 500, "Solide et durable, idéal pour les étudiants", 2)
-    dataManager.insertProduct("Stylo", 5, 1000, "Écriture fluide, disponible en plusieurs couleurs", 2)
-    dataManager.insertProduct("Sac à dos", 1500, 100, "Confortable et spacieux pour transporter vos affaires", 2)
+// Produits pour la catégorie "NOURRITURE" (catégorie ID = 1)
+    dataManager.insertProduct("Burger", 400, 20, "C'est un fast food", "https://www.shutterstock.com/shutterstock/photos/2282033179/display_1500/stock-photo-classic-hamburger-stock-photo-isolated-in-white-2282033179.jpg", 1);
+    dataManager.insertProduct("Pizza", 500, 30, "Délicieux et gourmand", "https://www.shutterstock.com/shutterstock/photos/1829205563/display_1500/stock-photo-fresh-homemade-italian-pizza-margherita-with-buffalo-mozzarella-and-basil-1829205563.jpg", 1);
+    dataManager.insertProduct("Gâteau", 1000, 10, "Sucré et délicieux, parfait pour un anniversaire", "https://www.shutterstock.com/shutterstock/photos/2465720135/display_1500/stock-photo-caramel-bundt-cake-in-a-dark-setting-with-florals-2465720135.jpg", 1);
+    dataManager.insertProduct("Sandwich", 250, 50, "Rapide et pratique pour le déjeuner", "https://www.shutterstock.com/shutterstock/photos/2452698355/display_1500/stock-photo-sandwich-one-fresh-big-submarine-sandwich-with-ham-cheese-lettuce-tomatoes-and-microgreens-on-2452698355.jpg", 1);
 
-    // Produits pour la catégorie "ELECTRONIQUE" (catégorie ID = 3)
-    dataManager.insertProduct("Téléphone", 30000, 15, "Smartphone dernière génération avec écran OLED", 3)
-    dataManager.insertProduct("Ordinateur portable", 70000, 10, "Puissant et léger, parfait pour le travail et les loisirs", 3)
-    dataManager.insertProduct("Casque audio", 2000, 50, "Son de haute qualité avec réduction de bruit", 3)
+// Produits pour la catégorie "FOURNITURE" (catégorie ID = 2)
+    dataManager.insertProduct("Cahier", 20, 500, "Solide et durable, idéal pour les étudiants", "https://www.shutterstock.com/shutterstock/photos/2407978697/display_1500/stock-photo-different-notebooks-on-light-pink-background-top-view-space-for-text-2407978697.jpg", 2);
+    dataManager.insertProduct("Stylo", 5, 1000, "Écriture fluide, disponible en plusieurs couleurs", "https://www.shutterstock.com/shutterstock/photos/2477506159/display_1500/stock-photo-a-black-pen-isolated-on-the-white-paper-background-2477506159.jpg", 2);
+    dataManager.insertProduct("Sac à dos", 1500, 100, "Confortable et spacieux pour transporter vos affaires", "https://www.shutterstock.com/shutterstock/photos/2450122393/display_1500/stock-photo-black-backpack-isolated-on-a-white-background-2450122393.jpg", 2);
 
-    // Produits pour la catégorie "MENAGER" (catégorie ID = 4)
-    dataManager.insertProduct("Aspirateur", 5000, 20, "Efficace pour nettoyer tous types de sols", 4)
-    dataManager.insertProduct("Machine à laver", 25000, 5, "Capacité de 7 kg avec plusieurs modes de lavage", 4)
-    dataManager.insertProduct("Réfrigérateur", 40000, 8, "Grand espace de rangement avec congélateur intégré", 4)
+// Produits pour la catégorie "ELECTRONIQUE" (catégorie ID = 3)
+    dataManager.insertProduct("Téléphone", 30000, 15, "Smartphone dernière génération avec écran OLED", "https://www.shutterstock.com/shutterstock/photos/2456481051/display_1500/stock-photo-mobile-or-smartphone-new-model-photo-isolated-on-transparent-background-clipping-path-2456481051.jpg", 3);
+    dataManager.insertProduct("Ordinateur portable", 70000, 10, "Puissant et léger, parfait pour le travail et les loisirs", "https://www.shutterstock.com/shutterstock/photos/683063848/display_1500/stock-photo-modern-laptop-isolated-on-the-white-background-683063848.jpg", 3);
+    dataManager.insertProduct("Casque audio", 2000, 50, "Son de haute qualité avec réduction de bruit", "https://www.shutterstock.com/shutterstock/photos/2426416757/display_1500/stock-photo-miami-usa-august-headphones-for-sale-at-a-best-buy-display-featuring-various-sony-2426416757.jpg", 3);
 
-    // Produits pour la catégorie "SOIN" (catégorie ID = 5)
-    dataManager.insertProduct("Shampooing", 150, 100, "Pour des cheveux propres et soyeux", 5)
-    dataManager.insertProduct("Crème hydratante", 300, 50, "Hydrate et nourrit la peau en profondeur", 5)
-    dataManager.insertProduct("Dentifrice", 50, 200, "Protection complète pour des dents saines et blanches", 5)
+// Produits pour la catégorie "MENAGER" (catégorie ID = 4)
+    dataManager.insertProduct("Aspirateur", 5000, 20, "Efficace pour nettoyer tous types de sols", "https://www.shutterstock.com/shutterstock/photos/2452799471/display_1500/stock-photo-a-cordless-vacuum-cleaner-cleans-the-carpet-on-the-floor-cleaning-and-cleaning-close-up-2452799471.jpg", 4);
+    dataManager.insertProduct("Machine à laver", 25000, 5, "Capacité de 7 kg avec plusieurs modes de lavage", "https://www.shutterstock.com/shutterstock/photos/2364564075/display_1500/stock-photo-laundry-room-interior-with-washing-machine-near-gray-grunge-wall-2364564075.jpg", 4);
+    dataManager.insertProduct("Réfrigérateur", 40000, 8, "Grand espace de rangement avec congélateur intégré", "https://www.shutterstock.com/shutterstock/photos/2407423627/display_1500/stock-photo-detail-in-kitchen-interior-blue-refrigerator-with-stainless-steel-handles-in-retro-style-near-2407423627.jpg", 4);
+
+// Produits pour la catégorie "SOIN" (catégorie ID = 5)
+    dataManager.insertProduct("Shampooing", 150, 100, "Pour des cheveux propres et soyeux", "https://www.shutterstock.com/shutterstock/photos/2459746831/display_1500/stock-photo-rice-shampoo-and-conditioner-organic-rice-water-hair-care-natural-beauty-organic-fermented-2459746831.jpg", 5);
+    dataManager.insertProduct("Crème hydratante", 300, 50, "Hydrate et nourrit la peau en profondeur", "https://www.shutterstock.com/shutterstock/photos/2467066395/display_1500/stock-photo-hands-middle-age-woman-hold-an-open-jar-of-white-hand-or-body-cream-next-to-pink-tea-roses-on-white-2467066395.jpg", 5);
+    dataManager.insertProduct("Dentifrice", 50, 200, "Protection complète pour des dents saines et blanches", "https://www.shutterstock.com/shutterstock/photos/2473121543/display_1500/stock-photo-pouring-a-whitening-purple-toothpaste-on-a-toothbrush-isolated-on-white-background-texture-of-2473121543.jpg", 5);
+
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -132,6 +134,7 @@ fun MainScreen1(
     goToRegistrationCategory: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -286,7 +289,7 @@ fun ScrollContent(
             .fillMaxWidth()
             .fillMaxSize()
     ) {
-        items(categories){ category ->
+        items(categories) { category ->
             run {
                 CategoryCard(category, seeListActivity)
             }
