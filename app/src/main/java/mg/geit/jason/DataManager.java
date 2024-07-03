@@ -29,6 +29,7 @@ public class DataManager extends SQLiteOpenHelper {
                 "prix_Produit integer not null,"+
                 "quantite_Produit integer not null,"+
                 "description_Produit text not null,"+
+                "imageUrl_Produit text not null,"+
                 "id_Categorie integer,"+
                 "foreign key(id_Categorie) references ProduitCategorie(id_Categorie)" +
                 ")";
@@ -42,21 +43,26 @@ public class DataManager extends SQLiteOpenHelper {
 
     }
 
-    public void insertProduct(String name, int prix, int qtt, String description, int id_CatProduit)
+    public void insertProduct(String name, int prix, int qtt, String description, String imageUrl, int id_CatProduit)
     {
-        String strSql = "Insert into Produits (name_Produit, prix_Produit, quantite_Produit, description_Produit,id_Categorie) values" +
-                "('"+name+"',"+prix+","+qtt+",'"+description+"',"+id_CatProduit+")";
+        // Échapper les apostrophes
+        name = name.replace("'", "''");
+        description = description.replace("'", "''");
+
+        String strSql = "Insert into Produits (name_Produit, prix_Produit, quantite_Produit, description_Produit, imageUrl_Produit, id_Categorie) values" +
+                "('"+name+"',"+prix+","+qtt+",'"+description+"','"+imageUrl+"',"+id_CatProduit+")";
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(strSql);
         Log.i("DataBase", "insertProduit invoked ");
     }
 
-    public void updateProduct(int id, String name, int prix, int qtt, String description) {
+    public void updateProduct(int id, String name, int prix, int qtt, String imageUrl, String description) {
         String strSql = "UPDATE Produits SET " +
                 "name_Produit = '" + name + "', " +
                 "prix_Produit = " + prix + ", " +
                 "quantite_Produit = " + qtt + ", " +
                 "description_Produit = '" + description +"' "+
+                "imageUrl_Produit = '" + imageUrl +"' "+
                 "WHERE id_Produit = " + id;
 
         SQLiteDatabase db = this.getWritableDatabase();
@@ -97,7 +103,7 @@ public class DataManager extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         while(! cursor.isAfterLast()){
-            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(4));
+            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3),cursor.getString(5), cursor.getString(4));
             listProduit.add(produit);
             cursor.moveToNext();
         }
@@ -112,7 +118,7 @@ public class DataManager extends SQLiteOpenHelper {
         Produit produit = null;
         if(cursor != null && cursor.moveToFirst())
             // Le curseur contient des données, on peut les lire
-            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(4));
+            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(5), cursor.getString(4));
         else
             Log.i("Database","le curseur ne contient pas de donnee");
 
