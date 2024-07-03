@@ -73,7 +73,7 @@ class ListProductActivity : ComponentActivity() {
                                         .apply { putExtra("idProduit", produit.id) }
                         startActivity(intent)
                     },
-                    product = Produit(null,"",null,null,""),
+                    product = Produit(null,"",null,null,"",""),
                     doModification = {Log.i("Debug", "doModification INVOKED")},
                     goToRegistrationProduit = {
                         val intent = Intent(this, CategoryRegistrationActivity::class.java)
@@ -125,7 +125,6 @@ fun ScrollDataProduct(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(0.dp)) // Ajoute un espace de 16dp entre la topBar et le TextFieldWithIcons
         TextFieldWithIcons()
         Spacer(modifier = Modifier.height(15.dp)) // Ajoute un espace de 16dp entre la topBar et le TextFieldWithIcons
         OutlinedCard(
