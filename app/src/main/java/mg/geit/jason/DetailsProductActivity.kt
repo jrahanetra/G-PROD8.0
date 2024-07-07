@@ -51,16 +51,16 @@ import mg.geit.jason.ui.theme.GPROD80Theme
 
 class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefreshListener{
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private var dataManager = DataManager(this)
+    private var dataManager = DataManagerSingleton.getInstance(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout)
-
-        val idProduct = intent.getIntExtra("idProduit",0)
-        Log.i("Debug", "$idProduct")
-        val product = dataManager.readProduct(idProduct)
         enableEdgeToEdge()
 
+        val idProduct = intent.getIntExtra("idProduit",0)
+        val product: Produit = dataManager.readProduct(idProduct)
+        val idCategory = product.idCategory
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
         val composeView : ComposeView = findViewById(R.id.composeView)
 
@@ -72,11 +72,14 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
                 MainScreen3(
                     product,
                     doModification = {product ->
-                        val intent = Intent(this, ModificationsProductActivity::class.java).apply {
-                            putExtra("idProduit", product.id)
-                        }
-                        Log.i("Coucou","Edit CLické")
-                        startActivity(intent)
+                       doModification(product.id)
+                    },
+                    goToPreviousActivity = {
+                        goToListProductActivity(idCategory)
+                    },
+                    onSuppressProduct = {
+                        dataManager.deleteProduct(product.id)
+                        goToListProductActivity(idCategory)
                     }
                 )
             }
@@ -94,51 +97,98 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
     }
 
     private fun refreshData(){
+
         val idProduct = intent.getIntExtra("idProduit",0)
         val product = dataManager.readProduct(idProduct)
+        val idCategory = product.idCategory
         setContent{
             GPROD80Theme {
                 Log.i("ProduitData", "$product")
                 MainScreen3(
                     product,
                     doModification = {product ->
-                        val intent = Intent(this, ModificationsProductActivity::class.java).apply {
-                            putExtra("idProduit", product.id)
-                        }
-                        Log.i("Coucou","Edit CLické")
-                        startActivity(intent)
+                        doModification(product.id)
+                    },
+                    goToPreviousActivity = {
+                        goToListProductActivity(idCategory)
+                    },
+                    onSuppressProduct = {
+                        dataManager.deleteProduct(product.id)
+                        goToListProductActivity(idCategory)
                     }
                 )
             }
         }
     }
+
+    /**
+     * FUNCTION DO MODIFICATION AND GO TO THE MODIFICATIONSPRODUCTACTIVITY
+     * @param product : Product the product to modify
+     */
+    private fun doModification(idProduct: Int?){
+        val intent = Intent(this, ModificationsProductActivity::class.java).apply {
+            putExtra("idProduit", idProduct)
+        }
+        startActivity(intent)
+    }
+
+    /**
+     * FUNCTION TO GO TO THE LISTPRODUCTACTIVITY
+     * @param idCategory : Int, the id of the category
+     */
+    private fun goToListProductActivity(idCategory : Int?){
+        val intent = Intent(this, ListProductActivity::class.java)
+            .apply { putExtra("idCategory", idCategory) }
+        startActivity(intent)
+    }
 }
 
+/**
+ * COMPONENT PRINCIPAL OF THIS ACTIVITY
+ * @param produit : Produit
+ * @param doModification : Lambda function to go to the ModificationsActivity
+ * @param goToPreviousActivity : Lambda function to go to the previous activity
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen3(
     produit: Produit,
-    doModification:(Produit)-> Unit
-){
+    doModification:(Produit)-> Unit,
+    goToPreviousActivity: () -> Unit,
+    onSuppressProduct: () -> Unit
+)
+{
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Header(title = "Détails", true, produit, doModification)
+            Header(
+                title = "Détails",
+                true,
+                produit,
+                doModification,
+                goToPreviousActivity
+            )
         },
         floatingActionButton = {
-            CustomExtendedFloatingActionButton()
+            CustomExtendedFloatingActionButton(onSuppressProduct)
         },
     ) { innerPadding ->
         SeeDetailsProduit(produit, innerPadding)
     }
 }
 
+/**
+ * CONTAINER OF ALL ELEMENTS IN THIS ACTIVITY
+ * @param produit : Produit, the product that we see the details
+ * @param innerPadding : PaddingValues, the default values of the elements in the container Scaffold
+ */
 @Composable
 fun SeeDetailsProduit(
     produit: Produit,
     innerPadding: PaddingValues
-){
+)
+{
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -167,6 +217,10 @@ fun SeeDetailsProduit(
     }
 }
 
+/**
+ * COMPONENT OF THE SEEDETAILSPRODUITS
+ * @param produit : Produit
+ */
 @Composable
 fun DisplayDetails(
     produit: Produit
@@ -210,6 +264,11 @@ fun DisplayDetails(
     }
 }
 
+/**
+ * THE DETAILS OF THE PRODUCT
+ * @param title : String, the title of an data
+ * @param data : String, the data
+ */
 @Composable
 fun DetailsText(
     title: String,
@@ -241,11 +300,17 @@ fun DetailsText(
     }
 }
 
+/**
+ * AN CUSTOMIZIED FLOATING ACTION BUTTON TO SUPPRESS THE PRODUCT
+ * @param onSuppressProduct : lambda function, the action to do after onclick
+ */
 @Composable
-fun CustomExtendedFloatingActionButton()
+fun CustomExtendedFloatingActionButton(
+    onSuppressProduct: () -> Unit
+)
 {
     ExtendedFloatingActionButton(
-        onClick = { /* TODO */ },
+        onClick = { onSuppressProduct() },
         containerColor = colorResource(id = R.color.color5), // Couleur de fond personnalisée
         shape = RoundedCornerShape(6.dp),
         modifier = Modifier
