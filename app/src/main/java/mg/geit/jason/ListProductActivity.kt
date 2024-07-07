@@ -33,6 +33,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -49,11 +50,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mg.geit.jason.ui.theme.GPROD80Theme
+import java.util.Locale
 
 class ListProductActivity : ComponentActivity() {
     private var dataManager = DataManagerSingleton.getInstance(this)
@@ -62,7 +63,13 @@ class ListProductActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val idCategory = intent.getIntExtra("idCategory", 0)
         Log.i("Debug", "$idCategory")
-        val products = dataManager.readProducts(idCategory)
+        val name = intent.getStringExtra("keySearch")?.trim()?.lowercase(Locale.getDefault())
+
+        Log.i("myname", "$name")
+        val products: MutableList<Produit> = dataManager.readProducts(idCategory)
+            .filter { it.name.trim().lowercase(Locale.getDefault()) == (name ?: it.name.trim().lowercase(Locale.getDefault())) }
+            .toMutableList()
+
         enableEdgeToEdge()
         setContent {
             GPROD80Theme {
@@ -83,6 +90,14 @@ class ListProductActivity : ComponentActivity() {
                     },
                     goToPreviousActivity = {
                         val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    },
+                    onSearch = {key ->
+                        val intent = Intent(this, ListProductActivity::class.java)
+                            .apply {
+                                putExtra("keySearch", key)
+                                putExtra("idCategory", idCategory)
+                            }
                         startActivity(intent)
                     }
                 )
@@ -108,10 +123,12 @@ fun MainScreen2(
     product: Produit,
     doModification: (Produit) -> Unit,
     goToRegistrationProduit:()->Unit,
-    goToPreviousActivity: () -> Unit
+    goToPreviousActivity: () -> Unit,
+    onSearch: (String) -> Unit
 )
 {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val showDialog = remember { mutableStateOf(false) }
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -120,14 +137,20 @@ fun MainScreen2(
                 false,
                 product,
                 doModification,
-                goToPreviousActivity
+                goToPreviousActivity,
+                onInfoClick = { showDialog.value = true }
             )
         },
         floatingActionButton = {
             ShowFloatingActionButton(goToRegistrationProduit)
         },
     ) { innerPadding ->
-        ScrollDataProduct(list, innerPadding, seeDetailsProduct)
+        ScrollDataProduct(
+            list,
+            innerPadding,
+            seeDetailsProduct,
+            onSearch
+        )
     }
 }
 
@@ -141,7 +164,8 @@ fun MainScreen2(
 fun ScrollDataProduct(
     list: List<Produit>,
     innerPadding : PaddingValues,
-    seeDetailsProduct: (Produit) -> Unit
+    seeDetailsProduct: (Produit) -> Unit,
+    onSearch: (String) -> Unit
 )
 {
     Column(
@@ -151,7 +175,7 @@ fun ScrollDataProduct(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        TextFieldWithIcons()
+        TextFieldWithIcons(onSearch)
         Spacer(modifier = Modifier.height(15.dp)) // Ajoute un espace de 16dp entre la topBar et le TextFieldWithIcons
         OutlinedCard(
             colors = CardDefaults.cardColors(
@@ -226,14 +250,21 @@ fun ShowProduct(
 
 /**
  * THE COMPONENT SEARCH TO SEARCH ONE PRODUCT
+ * @param onSearch: Lambda function to filter the list
  */
 @Composable
-fun TextFieldWithIcons()
+fun TextFieldWithIcons(
+    onSearch: (String) -> Unit
+)
 {
-    var text by remember { mutableStateOf(TextFieldValue("")) }
+    var text by remember { mutableStateOf("") }
     OutlinedTextField(
         value = text,
-        leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "SearchIcon") },
+        leadingIcon = {
+            IconButton(onClick = { onSearch(text) }) {
+                Icon(imageVector = Icons.Default.Search, contentDescription = "SearchIcon")
+            }
+        },
         //trailingIcon = { Icon(imageVector = Icons.Default.Add, contentDescription = null) },
         onValueChange = {
             text = it

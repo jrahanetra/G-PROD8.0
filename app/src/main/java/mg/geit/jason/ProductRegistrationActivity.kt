@@ -31,7 +31,6 @@ class ProductRegistrationActivity : ComponentActivity()
                 MainViewRegistrationProduct(
                     dataManager = DataManagerSingleton.getInstance(this),
                     idCategory,
-                    doModification = {},
                     thisActivity = this,
                     goToPreviousActivity = {
                         val intent = Intent(this, ListProductActivity::class.java)
@@ -46,19 +45,23 @@ class ProductRegistrationActivity : ComponentActivity()
 
 /**
  * MAINVIEW REGISTRATION PRODUCT
+ * @param dataManager: DataManager, the instance of DataManager
+ * @param idCategory: Int, the id category of the product
+ * @param thisActivity: Activity, to make toast in this ACTIVITY
+ * @param goToPreviousActivity: Lambda function
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainViewRegistrationProduct(
     dataManager: DataManager,
     idCategory: Int,
-    doModification:(Produit)->Unit,
     thisActivity: Activity,
     goToPreviousActivity: ()->Unit
 )
 {
     val produit = Produit(null, "", null, null, "","", null)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val showDialog = remember { mutableStateOf(false) }
 
     //Déclarer les états pour chaque champ de text
     var nameProduct by remember { mutableStateOf(produit.name) }
@@ -74,8 +77,9 @@ fun MainViewRegistrationProduct(
                 title = "Registration",
                 false,
                 produit,
-                doModification,
-                goToPreviousActivity
+                doModification = {},
+                goToPreviousActivity,
+                onInfoClick = { showDialog.value = true }
             )
         },
         floatingActionButton = {

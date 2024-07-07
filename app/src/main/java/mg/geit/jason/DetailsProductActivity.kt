@@ -33,6 +33,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -123,7 +125,7 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
 
     /**
      * FUNCTION DO MODIFICATION AND GO TO THE MODIFICATIONSPRODUCTACTIVITY
-     * @param product : Product the product to modify
+     * @param idProduct : Product the product to modify
      */
     private fun doModification(idProduct: Int?){
         val intent = Intent(this, ModificationsProductActivity::class.java).apply {
@@ -159,6 +161,7 @@ fun MainScreen3(
 )
 {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val showDialog = remember { mutableStateOf(false) }
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -167,7 +170,8 @@ fun MainScreen3(
                 true,
                 produit,
                 doModification,
-                goToPreviousActivity
+                goToPreviousActivity,
+                onInfoClick = { showDialog.value = true }
             )
         },
         floatingActionButton = {

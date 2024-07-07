@@ -10,6 +10,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,11 +26,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -41,22 +44,26 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import coil.transform.CircleCropTransformation
 import mg.geit.jason.ui.theme.GPROD80Theme
 
 class MainActivity : ComponentActivity() {
@@ -89,7 +96,7 @@ class MainActivity : ComponentActivity() {
                     goToPreviousActivity = {
                         val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
-                    }
+                    },
                 )
             }
         }
@@ -161,11 +168,11 @@ fun MainScreen1(
     produit: Produit,
     doModification: (Produit) -> Unit,
     goToRegistrationCategory: () -> Unit,
-    goToPreviousActivity: () -> Unit
+    goToPreviousActivity: () -> Unit,
 ) 
 {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
+    val showDialog = remember { mutableStateOf(false) }
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -174,7 +181,8 @@ fun MainScreen1(
                 false,
                 produit,
                 doModification,
-                goToPreviousActivity
+                goToPreviousActivity,
+                onInfoClick = { showDialog.value = true }
             )
         },
         floatingActionButton = {
@@ -182,7 +190,46 @@ fun MainScreen1(
         },
     ) { innerPadding ->
         ScrollContent(dataManager, innerPadding, seeListActivity)
+        if (showDialog.value) {
+            InfoDialog(
+                onDismiss = { showDialog.value = false },
+                nbTotalProduit = dataManager.readAllProduct().size,
+                prixTotal = dataManager.readAllProduct().sumOf { it.prix!!},
+                mostExpensive = dataManager.readAllProduct().maxBy { it.prix!! },
+                lessExpensive = dataManager.readAllProduct().minBy { it.prix!! },
+            )
+        }
     }
+}
+
+@Composable
+fun InfoDialog(
+    onDismiss: () -> Unit,
+    nbTotalProduit: Int,
+    prixTotal: Double,
+    mostExpensive: Produit,
+    lessExpensive: Produit
+)
+{
+    AlertDialog(
+        onDismissRequest = { onDismiss() },
+        title = {
+            Text(text = "Informations")
+        },
+        text = {
+            Column {
+                Text(text = "Nombre total de produit $nbTotalProduit")
+                Text(text = "\uD83D\uDCB2La valeur de l'inventaire est de $prixTotal Ariary")
+                Text(text = "\uD83C\uDFAFLe produit le plus cher est :  ${mostExpensive.name} avec une prix de ${mostExpensive.prix}")
+                Text(text = "\uD83C\uDFAFLe produit le moins cher est :  ${lessExpensive.name} avec une prix de ${lessExpensive.prix}")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = { onDismiss() }) {
+                Text("OK")
+            }
+        }
+    )
 }
 
 /**
@@ -223,7 +270,8 @@ fun Header(
     editable: Boolean,
     produit: Produit,
     doModification:(Produit)-> Unit,
-    goToPreviousActivity: ()-> Unit
+    goToPreviousActivity: ()-> Unit,
+    onInfoClick: () -> Unit
 )
 {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -244,15 +292,19 @@ fun Header(
                 IconButton(onClick = { goToPreviousActivity() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
+                        modifier = Modifier.size(40.dp),
+                        tint = Color.Black,
                         contentDescription = "Localized description"
                     )
                 }
             },
             actions = {
-                IconButton(onClick = { /* do something */ }) {
+                IconButton(onClick = { onInfoClick() }) {
                     Icon(
-                        imageVector = Icons.Filled.Menu,
-                        contentDescription = "Localized description"
+                        imageVector = Icons.Filled.Info,
+                        contentDescription = "Localized description",
+                        tint = Color.Black,
+                        modifier = Modifier.size(60.dp)
                     )
                 }
             },
@@ -394,7 +446,6 @@ fun CategoryCard(
                 ImageRequest.Builder(LocalContext.current).data(data = category.imageUrl)
                     .apply(block = fun ImageRequest.Builder.() {
                         crossfade(true)
-                        transformations(CircleCropTransformation())
                     }).build()
             )
 
@@ -405,8 +456,13 @@ fun CategoryCard(
                 modifier = Modifier
                     .size(128.dp)
                     .align(Alignment.CenterHorizontally)
+                    .clip(RoundedCornerShape(8.dp)) // Adjust the corner radius as needed
+                    .border(1.dp, Color.White, RoundedCornerShape(8.dp)) // Adjust the border width and color as needed
             )
-            Text(text = category.name.toString())
+            Text(
+                text = category.name.toString(),
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

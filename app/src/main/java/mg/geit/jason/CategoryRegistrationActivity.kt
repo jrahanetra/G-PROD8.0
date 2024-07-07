@@ -121,6 +121,7 @@ fun MainScreen5(
     val category = Category(null,null,null)
     val produit = Produit(null, "", null, null, "","", null)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val showDialog = remember { mutableStateOf(false) }
 
     //Déclarer les états pour chaque champ de text
     var nameCategory by remember { mutableStateOf(category.name) }
@@ -134,7 +135,8 @@ fun MainScreen5(
                 false,
                 produit,
                 doModification,
-                goToPreviousActivity
+                goToPreviousActivity,
+                onInfoClick = { showDialog.value = true }
             )
         },
         floatingActionButton = {

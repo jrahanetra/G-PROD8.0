@@ -50,7 +50,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
@@ -140,6 +139,8 @@ fun MainScreen4(
 )
 {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val showDialog = remember { mutableStateOf(false) }
+
     //Déclarer les états pour chaque champ de text
     var name by remember { mutableStateOf(produit.name) }
     var prix by remember { mutableStateOf(produit.prix.toString()) }
@@ -155,7 +156,8 @@ fun MainScreen4(
                 false,
                 produit,
                 doModification,
-                goToPreviousActivity
+                goToPreviousActivity,
+                onInfoClick = { showDialog.value = true }
             )
         },
         floatingActionButton = {
@@ -366,8 +368,10 @@ fun CustomExtendedFloatingActionButton1(
             .height(56.dp) // Hauteur du bouton
             .fillMaxWidth() // Remplit toute la largeur disponible
     ) {
-        Text(title,
-            fontSize = 20.sp) // Texte du bouton
+        Text(
+            title,
+            fontSize = 20.sp
+        ) // Texte du bouton
     }
 }
 
@@ -449,7 +453,6 @@ fun NumberFieldWithIconsEdit(
         },
         keyboardOptions = KeyboardOptions.Default.copy(
             keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Done
         ),
         colors = OutlinedTextFieldDefaults.colors(Color.Black),
     )
