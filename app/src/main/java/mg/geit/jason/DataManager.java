@@ -12,7 +12,8 @@ public class DataManager extends SQLiteOpenHelper {
     public static final String db_name = "G-PROD8.db";
     public static final int db_vesrion = 1;
 
-    public DataManager(Context context) {
+    public DataManager(Context context)
+    {
         super(context, db_name, null, db_vesrion);
     }
 
@@ -47,6 +48,23 @@ public class DataManager extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * FUNCTION TO READ ALL PRODUCTS IN THE TABLE PRODUITS
+     */
+    public List<Produit> readAllProduct()
+    {
+        List<Produit> listProduit = new ArrayList<>();
+        String strSql = "SELECT * FROM Produits";
+        Cursor cursor = this.getReadableDatabase().rawQuery(strSql, null);
+        cursor.moveToFirst();
+        while(! cursor.isAfterLast()){
+            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getInt(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
+            listProduit.add(produit);
+            cursor.moveToNext();
+        }
+        cursor.close();
+        return listProduit;
+    }
     /**
      * FUNCTION TO INSERT PRODUCT IN A CATEGORY
      * @param name the name of the product to insert
@@ -143,7 +161,7 @@ public class DataManager extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         while(! cursor.isAfterLast()){
-            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
+            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getInt(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
             listProduit.add(produit);
             cursor.moveToNext();
         }
@@ -164,7 +182,7 @@ public class DataManager extends SQLiteOpenHelper {
         Produit produit = null;
         if(cursor != null && cursor.moveToFirst())
             // Le curseur contient des données, on peut les lire
-            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getInt(2), cursor.getInt(3), cursor.getString(5), cursor.getString(4), cursor.getInt(6));
+            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getInt(3), cursor.getString(5), cursor.getString(4), cursor.getInt(6));
         else
             Log.i("Database","le curseur ne contient pas de donnee");
 
