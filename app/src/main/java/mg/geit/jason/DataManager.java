@@ -56,7 +56,7 @@ public class DataManager extends SQLiteOpenHelper {
      * @param imageUrl the image url of the product to insert
      * @param id_CatProduit the id of the catgory that this product belong to
      */
-    public void insertProduct(String name, int prix, int qtt, String description, String imageUrl, int id_CatProduit)
+    public void insertProduct(String name, double prix, double qtt, String description, String imageUrl, int id_CatProduit)
     {
         // Échapper les apostrophes
         name = name.replace("'", "''");
@@ -84,7 +84,7 @@ public class DataManager extends SQLiteOpenHelper {
                 "name_Produit = '" + name + "', " +
                 "prix_Produit = " + prix + ", " +
                 "quantite_Produit = " + qtt + ", " +
-                "description_Produit = '" + description +"' "+
+                "description_Produit = '" + description +"',"+
                 "imageUrl_Produit = '" + imageUrl +"' "+
                 "WHERE id_Produit = " + id;
 
@@ -188,5 +188,17 @@ public class DataManager extends SQLiteOpenHelper {
         int count = cursor.getInt(0);
         cursor.close();
         return count == 0;
+    }
+
+    /**
+     * FUNCTION TO DELETE PRODUCT
+     * @param idProduct : Integer, the integer of the product to delete
+     */
+    public void deleteProduct(Integer idProduct)
+    {
+        String strSql = "Delete from Produits where id_Produit= "+idProduct+"";
+        SQLiteDatabase  db = this.getWritableDatabase();
+        db.execSQL(strSql);
+        Log.i("DataBase", "suppressProduct invoked ");
     }
 }
