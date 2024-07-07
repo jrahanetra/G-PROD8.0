@@ -1,7 +1,5 @@
 package mg.geit.jason
 
-import android.app.Activity
-import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -25,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CardDefaults
@@ -51,6 +50,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,7 +59,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mg.geit.jason.ui.theme.GPROD80Theme
 
 class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefreshListener {
-    lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private val dataManager = DataManagerSingleton.getInstance(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,13 +77,12 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
         composeView.setContent {
             GPROD80Theme {
                 MainScreen4(
-                    this,
                     product,
                     doModification = {refreshData()},
                     dataManager,
                     goToPreviousActivity = {
                         val intent = Intent(this, ListProductActivity::class.java)
-                            .apply { putExtra("IdCategory", product.idCategory) }
+                            .apply { putExtra("idCategory", product.idCategory) }
                         startActivity(intent)
                     }
                 )
@@ -107,7 +107,6 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
         setContent {
             GPROD80Theme {
                 MainScreen4(
-                    this,
                     product,
                     doModification = {
                         refreshData()
@@ -115,6 +114,7 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
                     dataManager,
                     goToPreviousActivity = {
                         val intent = Intent(this, ListProductActivity::class.java)
+                            .apply { putExtra("idCategory", product.idCategory) }
                         startActivity(intent)
                     }
                 )
@@ -123,15 +123,22 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
     }
 }
 
+/**
+ * THE COMPONENT MAIN OF THIS ACTIVITY
+ * @param produit: Produit, the produit to modify
+ * @param doModification: Function lambda to do modification
+ * @param dataManager: the object dataManager
+ * @param goToPreviousActivity: Function lambda to go to the previous activity
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen4(
-    activity: Activity,
     produit: Produit,
     doModification:(Produit)->Unit,
     dataManager: DataManager,
     goToPreviousActivity: ()-> Unit
-){
+)
+{
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     //Déclarer les états pour chaque champ de text
     var name by remember { mutableStateOf(produit.name) }
@@ -165,8 +172,7 @@ fun MainScreen4(
                 )
                 doModification(modifiedProduit)
                 //Retourner un résultat à l'activité précédente
-                activity.setResult(RESULT_OK)
-                activity.finish()
+                goToPreviousActivity()
             }
         },
     )
@@ -187,6 +193,20 @@ fun MainScreen4(
     }
 }
 
+/**
+ * THE CONTAINER OF ALL FIELDS OF THIS COMPONENT
+ * @param innerPadding: PaddingValues, The default values of this component
+ * @param name: String, The name of the product
+ * @param onNameChange: Function to listen and update to the change of the name
+ * @param prix: String, The price of the product
+ * @param onPrixChange: Function to listen and update to the change of the price
+ * @param quantite: String, The quantity of the product
+ * @param onQuantiteChange: Function to listen and update to the change of the quantity
+ * @param imageUrl: String, The imageUrl of the product
+ * @param onImageUrlChange: Function to listen and update to the change of the imageUrl
+ * @param description: String, The description of the product
+ * @param onDescriptionChange: Function to listen and update to the change of the description
+ */
 @Composable
 fun ContainerFields(
     innerPadding: PaddingValues,
@@ -199,7 +219,8 @@ fun ContainerFields(
     imageUrl: String,
     onImageUrlChange: (String) -> Unit,
     description: String,
-    onDescriptionChange: (String) -> Unit)
+    onDescriptionChange: (String) -> Unit
+)
 {
     Column (
         modifier = Modifier
@@ -242,6 +263,19 @@ fun ContainerFields(
     }
 }
 
+/**
+ * ALL FIELDS
+ * @param name: String, The name of the product
+ * @param onNameChange: Function to listen and update to the change of the name
+ * @param prix: String, The price of the product
+ * @param onPrixChange: Function to listen and update to the change of the price
+ * @param quantite: String, The quantity of the product
+ * @param onQuantiteChange: Function to listen and update to the change of the quantity
+ * @param imageUrl: String, The imageUrl of the product
+ * @param onImageUrlChange: Function to listen and update to the change of the imageUrl
+ * @param description: String, The description of the product
+ * @param onDescriptionChange: Function to listen and update to the change of the description
+ */
 @Composable
 fun DisplayFields(
     name: String,
@@ -255,22 +289,28 @@ fun DisplayFields(
     description: String,
     onDescriptionChange: (String) -> Unit
 
-){
+)
+{
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ){
-        DisplayField("NomProduit", name, onNameChange)
-        DisplayField("Prix", prix, onPrixChange)
-        DisplayField("Quantité", quantite, onQuantiteChange)
-        DisplayField("ImageUrl", imageUrl, onImageUrlChange)
-        DisplayField("Description", description, onDescriptionChange)
+        DisplayTextField("NomProduit", name, onNameChange)
+        DisplayNumericField("Prix", prix, onPrixChange)
+        DisplayNumericField("Quantité", quantite, onQuantiteChange)
+        DisplayTextField("ImageUrl", imageUrl, onImageUrlChange)
+        DisplayTextField("Description", description, onDescriptionChange)
     }
 }
 
+/**
+ * ONE CONTAINER TEXT FIELD
+ * @param name : String the name of the Fields
+ * @param data : String the default data of the textField
+ */
 @Composable
-fun DisplayField(
+fun DisplayTextField(
     name: String,
     data: String,
     onValueChange: (String) -> Unit
@@ -285,6 +325,32 @@ fun DisplayField(
     }
 }
 
+/**
+ * ONE CONTAINER NUMERIC FIELD
+ * @param name : String the name of the Fields
+ * @param data : String the default data of the textField
+ */
+@Composable
+fun DisplayNumericField(
+    name: String,
+    data: String,
+    onValueChange: (String) -> Unit
+)
+{
+    Column(
+        modifier = Modifier
+            .padding(16.dp, 5.dp, 0.dp, 0.dp)
+            .fillMaxSize()
+    ){
+        NumberFieldWithIconsEdit(name, data, onValueChange)
+    }
+}
+
+/**
+ * AN CUSTOMIZIED FLOATING ACTION BUTTON TO SUBMIT THE CHANGE
+ * @param title :  String, the title of the floating action button
+ * @param onClick : lambda function, the action to do after onclick
+ */
 @Composable
 fun CustomExtendedFloatingActionButton1(
     title: String,
@@ -305,6 +371,12 @@ fun CustomExtendedFloatingActionButton1(
     }
 }
 
+/**
+ * THE TEXTFIELD WITH ICONS
+ * @param name : String, the name of one text field
+ * @param data : String, the default data of the textField
+ * @param onValueChange : Lambda function to listen and update to the change of the data
+ */
 @Composable
 fun TextFieldWithIconsEdit(
     name: String,
@@ -334,6 +406,52 @@ fun TextFieldWithIconsEdit(
                     )
                 },
         colors = OutlinedTextFieldDefaults.colors(Color.Black)
+    )
+}
+
+/**
+ *
+ * THE NUMERICFIELD WITH ICONS
+ * @param name : String, the name of one text field
+ * @param data : String, the default data of the textField
+ * @param onValueChange : Lambda function to listen and update to the change of the data
+ */
+@Composable
+fun NumberFieldWithIconsEdit(
+    name: String,
+    data: String,
+    onValueChange: (String) -> Unit
+)
+{
+    var text by remember { mutableStateOf(TextFieldValue(data)) }
+    OutlinedTextField(
+        value = text,
+        textStyle = LocalTextStyle.current,
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "EditIcon",
+                tint = Color.Black
+            )
+        },
+        onValueChange = {
+            // Allow only numeric values
+            val filteredText = it.text.filter { char -> char.isDigit() || char == '.' }
+            text = it.copy(text = filteredText)
+            onValueChange(filteredText)
+        },
+        modifier = Modifier.width(320.dp),
+        label = {
+            Text(
+                text = name,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
+        ),
+        colors = OutlinedTextFieldDefaults.colors(Color.Black),
     )
 }
 
