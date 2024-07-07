@@ -60,7 +60,7 @@ class ListProductActivity : ComponentActivity() {
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val idCategory = intent.getIntExtra("IdCategory", 0)
+        val idCategory = intent.getIntExtra("idCategory", 0)
         Log.i("Debug", "$idCategory")
         val products = dataManager.readProducts(idCategory)
         enableEdgeToEdge()
@@ -77,7 +77,8 @@ class ListProductActivity : ComponentActivity() {
                     product = Produit(null,"",null,null,"","",null),
                     doModification = {Log.i("Debug", "doModification INVOKED")},
                     goToRegistrationProduit = {
-                        val intent = Intent(this, CategoryRegistrationActivity::class.java)
+                        val intent = Intent(this, ProductRegistrationActivity::class.java)
+                            .apply { putExtra("idCategory", idCategory) }
                         startActivity(intent)
                     },
                     goToPreviousActivity = {
