@@ -50,12 +50,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import mg.geit.jason.ui.theme.GPROD80Theme
 
 class ListProductActivity : ComponentActivity() {
-    private var dataManager = DataManager(this)
+    private var dataManager = DataManagerSingleton.getInstance(this)
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,10 +74,14 @@ class ListProductActivity : ComponentActivity() {
                                         .apply { putExtra("idProduit", produit.id) }
                         startActivity(intent)
                     },
-                    product = Produit(null,"",null,null,"",""),
+                    product = Produit(null,"",null,null,"","",null),
                     doModification = {Log.i("Debug", "doModification INVOKED")},
                     goToRegistrationProduit = {
                         val intent = Intent(this, CategoryRegistrationActivity::class.java)
+                        startActivity(intent)
+                    },
+                    goToPreviousActivity = {
+                        val intent = Intent(this, MainActivity::class.java)
                         startActivity(intent)
                     }
                 )
@@ -85,14 +90,26 @@ class ListProductActivity : ComponentActivity() {
     }
 }
 
+/**
+ * THE PRINCIPAL COMPONENT OF THIS ACTIVITY
+ * @param list: List<Product> that the list of the product of one category
+ * @param seeDetailsProduct: Function lambda to go to the DetailsProductActivity to see details
+ * @param product: Product Just to satisfy the parameter
+ * @param doModification: Function lambda to redirect to the ModificationsProductActivity
+ * @param goToRegistrationProduit: Function lambda to redirect to the CategoryRegistrationActivity
+ * @param goToPreviousActivity: Function lambda to return to the previous activity
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen2(
     list: List<Produit>,
     seeDetailsProduct: (Produit) -> Unit,
-    product: Produit, doModification: (Produit) -> Unit,
-    goToRegistrationProduit:()->Unit
-){
+    product: Produit,
+    doModification: (Produit) -> Unit,
+    goToRegistrationProduit:()->Unit,
+    goToPreviousActivity: () -> Unit
+)
+{
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -101,8 +118,9 @@ fun MainScreen2(
                 title = "Listes",
                 false,
                 product,
-                doModification
-                )
+                doModification,
+                goToPreviousActivity
+            )
         },
         floatingActionButton = {
             ShowFloatingActionButton(goToRegistrationProduit)
@@ -112,12 +130,19 @@ fun MainScreen2(
     }
 }
 
+/**
+ * CONTAINER OF THE COMPOSABLE SCAFFOLD
+ * @param list: List<Product> that the list of the product of one category
+ * @param innerPadding: PaddingValues, The default values of this component
+ * @param seeDetailsProduct: Function lambda to redirect to the ListProductActivity
+ */
 @Composable
 fun ScrollDataProduct(
     list: List<Produit>,
     innerPadding : PaddingValues,
     seeDetailsProduct: (Produit) -> Unit
-){
+)
+{
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -152,11 +177,17 @@ fun ScrollDataProduct(
     }
 }
 
+/**
+ * FUNCTION TO SHOW ON PRODUCT OF THE LISTPRODUCT
+ * @param product: Produit, the product of the list
+ * @param seeDetailsProduct: Function lambda to redirect to the ListProductActivity
+ */
 @Composable
 fun ShowProduct(
     product: Produit,
     seeDetailsProduct: (Produit)-> Unit
-){
+)
+{
     var checked by remember { mutableStateOf(true) }
     OutlinedCard(
         colors = CardDefaults.cardColors(
@@ -192,6 +223,9 @@ fun ShowProduct(
     }
 }
 
+/**
+ * THE COMPONENT SEARCH TO SEARCH ONE PRODUCT
+ */
 @Composable
 fun TextFieldWithIcons()
 {
@@ -209,10 +243,14 @@ fun TextFieldWithIcons()
     )
 }
 
-//@Preview (showBackground = true)
-//@Composable
-//fun Preview2() {
-//    GPROD80Theme {
-//        ShowProduct(product = Produit("mon produit", 100, 200, "Rien à montrer pour l'instant"), )
-//    }
-//}
+@Preview(showBackground = true)
+@Composable
+fun Preview2()
+{
+    GPROD80Theme {
+        ShowProduct(
+            Produit(null,"ESSAIE",null,null,"null","",null),
+            seeDetailsProduct = {}
+        )
+    }
+}
