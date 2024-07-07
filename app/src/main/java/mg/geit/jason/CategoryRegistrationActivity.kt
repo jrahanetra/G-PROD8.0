@@ -1,6 +1,7 @@
 package mg.geit.jason
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -45,8 +46,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import mg.geit.jason.ui.theme.GPROD80Theme
 
 class CategoryRegistrationActivity : ComponentActivity(), SwipeRefreshLayout.OnRefreshListener{
-    lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private val dataManager = DataManager(this)
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private val dataManager = DataManagerSingleton.getInstance(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout)
@@ -62,8 +63,13 @@ class CategoryRegistrationActivity : ComponentActivity(), SwipeRefreshLayout.OnR
             GPROD80Theme {
                 MainScreen5 (
                     dataManager,
+                    //here just to satisfy to the parameter
                     doModification = {},
-                    this
+                    this,
+                    goToPreviousActivity = {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    }
                 )
             }
         }
@@ -76,7 +82,6 @@ class CategoryRegistrationActivity : ComponentActivity(), SwipeRefreshLayout.OnR
             swipeRefreshLayout.isRefreshing = false
         }, 300)
     }
-
     private fun refreshData()
     {
         setContent {
@@ -87,21 +92,34 @@ class CategoryRegistrationActivity : ComponentActivity(), SwipeRefreshLayout.OnR
                         refreshData()
                     },
                     this,
+                    goToPreviousActivity = {
+                        val intent = Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                    }
                 )
             }
         }
     }
 }
 
+/**
+ * PRINCIPAL COMPONENT OF THIS ACTIVITY
+ * @param dataManager : DataManager, the only instance of the classe dataManager
+ * @param doModification
+ * @param thisActivity : Activity, the activity
+ * @param goToPreviousActivity : To go to the previous activity
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen5(
     dataManager: DataManager,
     doModification:(Produit)->Unit,
     thisActivity : Activity,
-){
+    goToPreviousActivity: ()-> Unit
+)
+{
     val category = Category(null,null,null)
-    val produit = Produit(null, "", null, null, "","")
+    val produit = Produit(null, "", null, null, "","", null)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
 
     //Déclarer les états pour chaque champ de text
@@ -111,14 +129,21 @@ fun MainScreen5(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Header(title = "Registration", false, produit, doModification)
+            Header(
+                title = "Registration",
+                false,
+                produit,
+                doModification,
+                goToPreviousActivity
+            )
         },
         floatingActionButton = {
             CustomExtendedFloatingActionButton1("AJOUTER"){
                 // Traitez les données des champs de texte ici
                 //Ajout de nouvelle catégories
                 dataManager.insertCatProduct(nameCategory, imageUrl)
-                Toast.makeText(thisActivity,"Catégorie Ajouter",Toast.LENGTH_LONG).show()
+                Toast.makeText(thisActivity,"Catégorie Ajouté",Toast.LENGTH_LONG).show()
+                goToPreviousActivity()
             }
         },
     ) { innerPadding ->
@@ -130,12 +155,19 @@ fun MainScreen5(
     }
 }
 
+/**
+ * CONTAINER OF ALL FIELDS IN THIS ACTIVITY
+ * @param innerPadding: PaddingValues, The default values of this component
+ * @param onNameCategorieChange: To update and listen of the change of the name Of Category
+ * @param onImageChange: To update and listen of the change of the imageUrl Of Category
+ */
 @Composable
 fun ContainerFieldsRegisCategorie(
     innerPadding: PaddingValues,
     onNameCategorieChange: (String) -> Unit,
     onImageChange : (String) -> Unit,
-){
+)
+{
     Column (
         modifier = Modifier
             .fillMaxSize()
@@ -169,11 +201,17 @@ fun ContainerFieldsRegisCategorie(
     }
 }
 
+/**
+ * CONTAINER OF AN FIELDS
+ * @param onNameCategoryChange: To update and listen of the change of the name Of Category
+ * @param onImageChange: To update and listen of the change of the imageUrl Of Category
+ */
 @Composable
 fun DisplayFields1(
-    onNameCategorieChange: (String) -> Unit,
+    onNameCategoryChange: (String) -> Unit,
     onImageChange: (String) -> Unit,
-){
+)
+{
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -193,8 +231,8 @@ fun DisplayFields1(
                 fontWeight = FontWeight.Bold
             )
         }
-        DisplayField("NomCatégorie", "", onNameCategorieChange)
-        DisplayField("UrlImage", "", onImageChange)
+        DisplayTextField("NomCatégorie", "", onNameCategoryChange)
+        DisplayTextField("UrlImage", "", onImageChange)
     }
 }
 
@@ -202,6 +240,5 @@ fun DisplayFields1(
 @Composable
 fun Preview3(){
     GPROD80Theme {
-        val produit = Produit(null,"",null,null,"","")
     }
 }
