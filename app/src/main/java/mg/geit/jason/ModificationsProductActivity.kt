@@ -2,6 +2,7 @@ package mg.geit.jason
 
 import android.app.Activity
 import android.app.Activity.RESULT_OK
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -58,7 +59,7 @@ import mg.geit.jason.ui.theme.GPROD80Theme
 
 class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefreshListener {
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    private val dataManager = DataManager(this)
+    private val dataManager = DataManagerSingleton.getInstance(this)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout)
@@ -78,7 +79,12 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
                     this,
                     product,
                     doModification = {refreshData()},
-                    dataManager
+                    dataManager,
+                    goToPreviousActivity = {
+                        val intent = Intent(this, ListProductActivity::class.java)
+                            .apply { putExtra("IdCategory", product.idCategory) }
+                        startActivity(intent)
+                    }
                 )
             }
         }
@@ -106,7 +112,11 @@ class ModificationsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnR
                     doModification = {
                         refreshData()
                     },
-                    dataManager
+                    dataManager,
+                    goToPreviousActivity = {
+                        val intent = Intent(this, ListProductActivity::class.java)
+                        startActivity(intent)
+                    }
                 )
             }
         }
@@ -119,7 +129,8 @@ fun MainScreen4(
     activity: Activity,
     produit: Produit,
     doModification:(Produit)->Unit,
-    dataManager: DataManager
+    dataManager: DataManager,
+    goToPreviousActivity: ()-> Unit
 ){
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     //Déclarer les états pour chaque champ de text
@@ -132,7 +143,13 @@ fun MainScreen4(
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            Header(title = "Edit", false, produit, doModification)
+            Header(
+                title = "Edit",
+                false,
+                produit,
+                doModification,
+                goToPreviousActivity
+            )
         },
         floatingActionButton = {
             CustomExtendedFloatingActionButton1("SOUMETTRE"){
@@ -257,7 +274,8 @@ fun DisplayField(
     name: String,
     data: String,
     onValueChange: (String) -> Unit
-){
+)
+{
     Column(
         modifier = Modifier
             .padding(16.dp, 5.dp, 0.dp, 0.dp)
@@ -271,7 +289,8 @@ fun DisplayField(
 fun CustomExtendedFloatingActionButton1(
     title: String,
     onClick:()-> Unit
-) {
+)
+{
     ExtendedFloatingActionButton(
         onClick = { onClick() },
         containerColor = colorResource(id = R.color.green), // Couleur de fond personnalisée
@@ -291,7 +310,8 @@ fun TextFieldWithIconsEdit(
     name: String,
     data: String,
     onValueChange: (String) -> Unit
-) {
+)
+{
     var text by remember { mutableStateOf(TextFieldValue(data)) }
     OutlinedTextField(
         value = text,
