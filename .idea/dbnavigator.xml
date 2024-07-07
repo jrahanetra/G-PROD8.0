@@ -26,6 +26,7 @@
     <connection id="085a6fda-b0a5-404c-aaca-0c5643f433dc" />
   </component>
   <component name="DBNavigator.Project.DatasetFilterManager">
+    <filter-actions connection-id="085a6fda-b0a5-404c-aaca-0c5643f433dc" dataset="main.Produits" active-filter-id="EMPTY_FILTER" />
     <filter-actions connection-id="085a6fda-b0a5-404c-aaca-0c5643f433dc" dataset="main.ProduitCategorie" active-filter-id="EMPTY_FILTER" />
   </component>
   <component name="DBNavigator.Project.ExecutionManager">
