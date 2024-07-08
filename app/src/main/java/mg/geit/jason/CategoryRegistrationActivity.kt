@@ -154,6 +154,15 @@ fun MainScreen5(
             onNameCategorieChange = { nameCategory = it },
             onImageChange = { imageUrl = it },
         )
+        if (showDialog.value) {
+            InfoDialog(
+                onDismiss = { showDialog.value = false },
+                nbTotalProduit = dataManager.readAllProduct().size,
+                prixTotal = dataManager.readAllProduct().sumOf { it.prix!!},
+                mostExpensive = dataManager.readAllProduct().maxBy { it.prix!! },
+                lessExpensive = dataManager.readAllProduct().minBy { it.prix!! },
+            )
+        }
     }
 }
 
