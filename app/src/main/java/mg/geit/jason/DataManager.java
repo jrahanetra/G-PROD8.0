@@ -38,8 +38,13 @@ public class DataManager extends SQLiteOpenHelper {
                 "id_Categorie integer,"+
                 "foreign key(id_Categorie) references ProduitCategorie(id_Categorie)" +
                 ")";
+        String createAdmin = "Create Table Admin (" +
+                "id_Admin integer primary key autoincrement," +
+                "username text not null," +
+                "mot_de_passe text not null)";
         db.execSQL(strSql);
         db.execSQL(newStrSql);
+        db.execSQL(createAdmin);
         Log.i("DataBase", "onCreate invoked");
     }
 
@@ -65,6 +70,7 @@ public class DataManager extends SQLiteOpenHelper {
         cursor.close();
         return listProduit;
     }
+
     /**
      * FUNCTION TO INSERT PRODUCT IN A CATEGORY
      * @param name the name of the product to insert
@@ -109,6 +115,52 @@ public class DataManager extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL(strSql);
         Log.i("DataBase", "updateProduct invoked for id_Produit: " + id);
+    }
+
+    /**
+     * FUNCTION TO INSERT PERSONAL USER
+     * @param username
+     * @param password
+     */
+    public void insertAdmin(String username,String password)
+    {
+        String str = "Insert into Admin (username, mot_de_passe) values" +
+                "('"+username+"','"+password+"')";
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL(str);
+        Log.i("DataBase","Admin create");
+    }
+
+    /**
+     * FUNCTION TO VERIFY IF ADMIN OR NO
+     * @param username
+     * @param password
+     */
+    public boolean isAdmin(String username, String password)
+    {
+        List<Admin> listAdmin = new ArrayList<>();
+        String strSql = "Select* from Admin";
+        Cursor cursor = this.getReadableDatabase().rawQuery(strSql, null);
+        cursor.moveToFirst();
+        while (! cursor.isAfterLast()){
+            Admin admin = new Admin(cursor.getInt(0), cursor.getString(1),
+                    cursor.getString(2));
+            listAdmin.add(admin);
+            cursor.moveToNext();
+        }
+        cursor.close();
+
+        int check = 0;
+        for (Admin admin : listAdmin){
+            if(admin.getUsername().equals(username) && admin.getPassword().equals(password)){
+                check ++;
+            }
+        }
+        Log.i("DataBase", ""+check);
+        if (check > 0)
+            return true;
+        else
+            return false;
     }
 
     /**
