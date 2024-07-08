@@ -94,7 +94,7 @@ class MainActivity : ComponentActivity() {
                         startActivity(intent)
                     },
                     goToPreviousActivity = {
-                        val intent = Intent(this, MainActivity::class.java)
+                        val intent = Intent(this, LoginActivity::class.java)
                         startActivity(intent)
                     },
                 )
@@ -208,7 +208,7 @@ fun MainScreen1(
 
 /**
  * CONTAINER DIALOG TO SHOW SOME SUITABLES INFORMATIONS
- * @param onDismsiss: lambda function to know if the DIALOG IS TO SHOW OR NO
+ * @param onDismiss: lambda function to know if the DIALOG IS TO SHOW OR NO
  * @param nbTotalProduit: Int the total number of the product in table Product
  * @param prixTotal: The total price of all products
  * @param mostExpensive: Produit
