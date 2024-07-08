@@ -151,6 +151,15 @@ fun MainScreen2(
             seeDetailsProduct,
             onSearch
         )
+        if (showDialog.value) {
+            InfoDialog(
+                onDismiss = { showDialog.value = false },
+                nbTotalProduit = list.size,
+                prixTotal = list.sumOf { it.prix!!},
+                mostExpensive = list.maxBy { it.prix!! },
+                lessExpensive = list.minBy { it.prix!! },
+            )
+        }
     }
 }
 
