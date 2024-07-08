@@ -55,6 +55,7 @@ public class DataManager extends SQLiteOpenHelper {
 
     /**
      * FUNCTION TO READ ALL PRODUCTS IN THE TABLE PRODUITS
+     * @return List<Produit> , the list of all product
      */
     public List<Produit> readAllProduct()
     {
@@ -63,7 +64,7 @@ public class DataManager extends SQLiteOpenHelper {
         Cursor cursor = this.getReadableDatabase().rawQuery(strSql, null);
         cursor.moveToFirst();
         while(! cursor.isAfterLast()){
-            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getInt(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
+            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
             listProduit.add(produit);
             cursor.moveToNext();
         }
@@ -102,8 +103,11 @@ public class DataManager extends SQLiteOpenHelper {
      * @param imageUrl the url image of the product
      * @param description the description of the product
      */
-    public void updateProduct(int id, String name, int prix, int qtt, String imageUrl, String description)
+    public void updateProduct(int id, String name, double prix, double qtt, String imageUrl, String description)
     {
+        // Échapper les apostrophes
+        name = name.replace("'", "''");
+        description = description.replace("'", "''");
         String strSql = "UPDATE Produits SET " +
                 "name_Produit = '" + name + "', " +
                 "prix_Produit = " + prix + ", " +
@@ -213,7 +217,7 @@ public class DataManager extends SQLiteOpenHelper {
         cursor.moveToFirst();
 
         while(! cursor.isAfterLast()){
-            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getInt(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
+            Produit produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3),cursor.getString(5), cursor.getString(4), cursor.getInt(6));
             listProduit.add(produit);
             cursor.moveToNext();
         }
@@ -234,7 +238,7 @@ public class DataManager extends SQLiteOpenHelper {
         Produit produit = null;
         if(cursor != null && cursor.moveToFirst())
             // Le curseur contient des données, on peut les lire
-            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getInt(3), cursor.getString(5), cursor.getString(4), cursor.getInt(6));
+            produit = new Produit(cursor.getInt(0),cursor.getString(1), cursor.getDouble(2), cursor.getDouble(3), cursor.getString(5), cursor.getString(4), cursor.getInt(6));
         else
             Log.i("Database","le curseur ne contient pas de donnee");
 
