@@ -163,12 +163,12 @@ fun MainScreen4(
         floatingActionButton = {
             CustomExtendedFloatingActionButton1("SOUMETTRE"){
                 // Traitements des données de champs
-                produit.id?.let { dataManager.updateProduct(it, name, prix.toInt(), quantite.toInt(), imageUrl, description ) }
+                produit.id?.let { dataManager.updateProduct(it, name, prix.toDouble(), quantite.toDouble(), imageUrl, description ) }
                 // Vous pouvez également mettre à jour les données du produit et appeler doModification
                 val modifiedProduit = produit.copy(
                     name = name,
                     prix = prix.toDoubleOrNull() ?: produit.prix,
-                    quantite = quantite.toIntOrNull() ?: produit.quantite,
+                    quantite = quantite.toDoubleOrNull() ?: produit.quantite,
                     imageUrl = imageUrl,
                     description = description
                 )
