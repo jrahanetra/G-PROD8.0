@@ -24,11 +24,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
@@ -47,7 +49,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -198,8 +202,8 @@ fun DisplayFields2(
                 fontWeight = FontWeight.Bold,
             )
         }
-        TextFieldWithIconsEdit1("Nom", "", Icons.Default.AccountCircle, onNameChange)
-        TextFieldWithIconsEdit1("Password", "", Icons.Default.Lock, onPasswordChange)
+        TextFieldWithIconsEditNameUser("Nom", "", Icons.Default.AccountCircle, onNameChange)
+        TextFieldWithIconsPassword("Password", "", Icons.Default.Lock, onPasswordChange)
 
         Button(
             onClick = { verify()  },
@@ -219,13 +223,13 @@ fun DisplayFields2(
 }
 
 /**
- * THE TEXTFIELD WITH ICONS
+ * THE TEXTFIELD WITH ICONS, WHERE THE USER SEND THE PSEUDO
  * @param name : String, the name of one text field
  * @param data : String, the default data of the textField
  * @param onValueChange : Lambda function to listen and update to the change of the data
  */
 @Composable
-fun TextFieldWithIconsEdit1(
+fun TextFieldWithIconsEditNameUser(
     name: String,
     data: String,
     icon: ImageVector,
@@ -255,6 +259,56 @@ fun TextFieldWithIconsEdit1(
             )
         },
         colors = OutlinedTextFieldDefaults.colors(Color.Black)
+    )
+}
+
+/**
+ * THE TEXTFIELD WITH ICONS, WHERE THE USER SEND HER PASSWORD
+ * @param name : String, the name of one text field
+ * @param data : String, the default data of the textField
+ * @param onValueChange : Lambda function to listen and update to the change of the data
+ */
+@Composable
+fun TextFieldWithIconsPassword(
+    name: String,
+    data: String,
+    icon: ImageVector,
+    onValueChange: (String) -> Unit
+) {
+    var text by remember { mutableStateOf(TextFieldValue(data)) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = text,
+        textStyle = LocalTextStyle.current,
+        leadingIcon = {
+            Icon(
+                imageVector = icon,
+                contentDescription = "EditIcon",
+                tint = Color.Black
+            )
+        },
+        onValueChange = {
+            text = it
+            onValueChange(it.text)
+        },
+        modifier = Modifier.width(320.dp),
+        shape = RoundedCornerShape(20.dp), // Définir les coins arrondis
+        label = {
+            Text(
+                text = name,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        colors = OutlinedTextFieldDefaults.colors(Color.Black),
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(
+                onClick = { passwordVisible = !passwordVisible },
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Icon(imageVector = if (passwordVisible) Icons.Default.Search else Icons.Default.Lock, contentDescription = if (passwordVisible) "Hide password" else "Show Passwor")
+            }
+        }
     )
 }
 
