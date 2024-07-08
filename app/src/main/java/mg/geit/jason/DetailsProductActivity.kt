@@ -72,6 +72,7 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
             GPROD80Theme {
                 Log.i("ProduitData", "$product")
                 MainScreen3(
+                    dataManager,
                     product,
                     doModification = {product ->
                        doModification(product.id)
@@ -107,6 +108,7 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
             GPROD80Theme {
                 Log.i("ProduitData", "$product")
                 MainScreen3(
+                    dataManager,
                     product,
                     doModification = {product ->
                         doModification(product.id)
@@ -154,6 +156,7 @@ class DetailsProductActivity : ComponentActivity(), SwipeRefreshLayout.OnRefresh
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen3(
+    dataManager: DataManager,
     produit: Produit,
     doModification:(Produit)-> Unit,
     goToPreviousActivity: () -> Unit,
@@ -179,6 +182,15 @@ fun MainScreen3(
         },
     ) { innerPadding ->
         SeeDetailsProduit(produit, innerPadding)
+        if (showDialog.value) {
+            InfoDialog(
+                onDismiss = { showDialog.value = false },
+                nbTotalProduit = dataManager.readAllProduct().size,
+                prixTotal = dataManager.readAllProduct().sumOf { it.prix!!},
+                mostExpensive = dataManager.readAllProduct().maxBy { it.prix!! },
+                lessExpensive = dataManager.readAllProduct().minBy { it.prix!! },
+            )
+        }
     }
 }
 
