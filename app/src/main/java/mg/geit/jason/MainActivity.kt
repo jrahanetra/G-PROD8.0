@@ -110,6 +110,10 @@ class MainActivity : ComponentActivity() {
 fun insertionData(dataManager: DataManager)
 {
     Log.i("insertions", "Insertion data invoked")
+    //INSERT ADMIN
+    dataManager.insertAdmin("user2.0", "user2.0")
+
+    //INSERT CATEGORY
     dataManager.insertCatProduct("NOURRITURE", "https://images.pexels.com/photos/1640777/pexels-photo-1640777.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
     dataManager.insertCatProduct("FOURNITURE", "https://images.pexels.com/photos/159538/school-book-binder-folder-notebook-159538.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1")
     dataManager.insertCatProduct("ELECTRONIQUE", "https://images.pexels.com/photos/6446709/pexels-photo-6446709.jpeg?auto=compress&cs=tinysrgb&w=600")
@@ -202,6 +206,14 @@ fun MainScreen1(
     }
 }
 
+/**
+ * CONTAINER DIALOG TO SHOW SOME SUITABLES INFORMATIONS
+ * @param onDismsiss: lambda function to know if the DIALOG IS TO SHOW OR NO
+ * @param nbTotalProduit: Int the total number of the product in table Product
+ * @param prixTotal: The total price of all products
+ * @param mostExpensive: Produit
+ * @param lessExpensive: Produit
+ */
 @Composable
 fun InfoDialog(
     onDismiss: () -> Unit,
@@ -218,8 +230,8 @@ fun InfoDialog(
         },
         text = {
             Column {
-                Text(text = "Nombre total de produit $nbTotalProduit")
-                Text(text = "\uD83D\uDCB2La valeur de l'inventaire est de $prixTotal Ariary")
+                Text(text = "$nbTotalProduit Produits dans l'inventaire")
+                Text(text = "\uD83D\uDCB2Avec une valeur de $prixTotal Ariary")
                 Text(text = "\uD83C\uDFAFLe produit le plus cher est :  ${mostExpensive.name} avec une prix de ${mostExpensive.prix}")
                 Text(text = "\uD83C\uDFAFLe produit le moins cher est :  ${lessExpensive.name} avec une prix de ${lessExpensive.prix}")
             }
